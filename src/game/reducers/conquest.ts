@@ -2,6 +2,7 @@ import type { GameState, PlayerId, Territory } from '../types.js';
 import { getCombatStrength, listAllyCandidates, isAutoPreventSuicide } from '../combat.js';
 import { nextFloat } from '../rng.js';
 import { probSuccess } from '../locProb.js';
+import { recomputeResourceDoubles } from '../activation.js';
 
 export type AttackInput = {
   player: PlayerId;
@@ -231,6 +232,14 @@ export function applyResolveCombat(prev: GameState): GameState {
   const probMsg = probability !== null
     ? ` (P(att-win)=${probability.toFixed(3)})`
     : '';
+
+  if (attackerWon) {
+    const intermediate: GameState = {
+      ...prev, rngCursor: nextRngCursor,
+      pendingCombat: { ...c, resolved: true, attackerWon },
+    };
+    return applyPostAttackWin(intermediate, c);
+  }
   return {
     ...prev,
     rngCursor: nextRngCursor,
@@ -238,7 +247,79 @@ export function applyResolveCombat(prev: GameState): GameState {
     log: [
       ...prev.log,
       { year: prev.year, phase: 'conquest', player: c.attackerId,
-        message: `Combat resolved: ${attackerWon ? 'attacker won' : 'attacker lost'}${probMsg}` },
+        message: `Combat resolved: attacker lost${probMsg}` },
+    ],
+  };
+}
+
+function applyPostAttackWin(state: GameState, c: NonNullable<GameState['pendingCombat']>): GameState {
+  const attackerId = c.attackerId;
+  const defenderId = c.defenderId;
+  const targetT = state.territories[c.targetTerritoryId]!;
+  const hadHorse = targetT.hasHorse;
+  const hadWeapon = targetT.hasWeapon;
+  const hadStockpile = targetT.hasStockpile;
+
+  let territories = state.territories.map((t) => {
+    if (t.id !== c.targetTerritoryId) return t;
+    let next = { ...t, ownerId: attackerId };
+    if (c.horseFromTerritoryId !== null && !hadHorse) next = { ...next, hasHorse: true };
+    if (c.weaponFromTerritoryId !== null && !hadWeapon) next = { ...next, hasWeapon: true };
+    if (hadStockpile) next = { ...next, hasStockpile: false };
+    return next;
+  });
+  const boats = state.boats.map((b) =>
+    b && b.homeTerritoryId === c.targetTerritoryId ? { ...b, ownerId: attackerId } : b);
+
+  // Compute defender's captured stockpile (slots 0-3) before mutations
+  const captured: [number, number, number, number] | null =
+    (hadStockpile && defenderId !== null)
+      ? [
+          state.players[defenderId]!.stockpile[0],
+          state.players[defenderId]!.stockpile[1],
+          state.players[defenderId]!.stockpile[2],
+          state.players[defenderId]!.stockpile[3],
+        ]
+      : null;
+
+  let players = state.players.map((p) => {
+    let stock: typeof p.stockpile | null = null;
+    let stockpileLocation = p.stockpileLocation;
+    if (hadHorse) {
+      if (defenderId !== null && p.id === defenderId) {
+        stock = stock ?? [...p.stockpile] as typeof p.stockpile;
+        stock[4] = Math.max(0, stock[4] - 1);
+      }
+      if (p.id === attackerId && c.horseFromTerritoryId === null) {
+        stock = stock ?? [...p.stockpile] as typeof p.stockpile;
+        stock[4] = stock[4] + 1;
+      }
+    }
+    if (captured !== null) {
+      if (defenderId !== null && p.id === defenderId) {
+        stock = stock ?? [...p.stockpile] as typeof p.stockpile;
+        stock[0] = 0; stock[1] = 0; stock[2] = 0; stock[3] = 0;
+        stockpileLocation = null;
+      }
+      if (p.id === attackerId) {
+        stock = stock ?? [...p.stockpile] as typeof p.stockpile;
+        for (let i = 0; i < 4; i++) stock[i] = stock[i]! + captured[i]!;
+      }
+    }
+    return stock !== null
+      ? { ...p, stockpile: stock, stockpileLocation }
+      : p;
+  });
+
+  const swept = recomputeResourceDoubles({
+    ...state, territories, boats, players,
+  });
+  return {
+    ...swept,
+    log: [
+      ...state.log,
+      { year: state.year, phase: 'conquest', player: attackerId,
+        message: `Territory ${c.targetTerritoryId} captured` },
     ],
   };
 }
