@@ -150,7 +150,7 @@ export type GameState = {
   year: number;
   attackNumber: 1 | 2;
   shipmentUsed: boolean;
-  shipmentForfeitsSecondAttack: boolean;
+  shipmentForfeitsSecondAttack: boolean[];  // indexed by PlayerId
   pendingTrade: TradeOffer | null;
   pendingCombat: CombatState | null;
   rejectedTrades: RejectedTrade[];

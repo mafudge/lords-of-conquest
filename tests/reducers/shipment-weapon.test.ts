@@ -16,7 +16,7 @@ const initial = (): GameState => ({
   setup, squares: [], territories: [], boats: [], players: [],
   touching: [], distance: [],
   turnOrder: [], currentPhase: 'setup', currentPlayer: 0,
-  year: 0, attackNumber: 1, shipmentUsed: false, shipmentForfeitsSecondAttack: false,
+  year: 0, attackNumber: 1, shipmentUsed: false, shipmentForfeitsSecondAttack: [],
   pendingTrade: null, pendingCombat: null,
   rejectedTrades: [], autoReject: [], log: [],
 });
@@ -28,7 +28,7 @@ function adjPair(): { state: GameState; from: number; to: number } {
     s = reduce(s, { kind: 'selection', player: s.currentPlayer, territoryId: free.id });
   }
   s = reduce(s, { kind: 'endPhase', player: s.currentPlayer });
-  s = { ...s, currentPhase: 'shipment', currentPlayer: 0, shipmentUsed: false, shipmentForfeitsSecondAttack: false };
+  s = { ...s, currentPhase: 'shipment', currentPlayer: 0, shipmentUsed: false, shipmentForfeitsSecondAttack: [] };
   let from = -1, to = -1;
   for (let a = 0; a < s.territories.length; a++) {
     for (let b = 0; b < s.territories.length; b++) {

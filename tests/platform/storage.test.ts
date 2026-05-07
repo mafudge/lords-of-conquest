@@ -32,7 +32,7 @@ const sampleState = (year: number): GameState => ({
   },
   squares: [], territories: [], touching: [], distance: [], boats: [], players: [],
   turnOrder: [0, 1], currentPhase: 'selection', currentPlayer: 0,
-  year, attackNumber: 1, shipmentUsed: false, shipmentForfeitsSecondAttack: false,
+  year, attackNumber: 1, shipmentUsed: false, shipmentForfeitsSecondAttack: [],
   pendingTrade: null, pendingCombat: null,
   rejectedTrades: [], autoReject: [[false, false], [false, false]],
   log: [],

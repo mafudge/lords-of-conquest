@@ -47,6 +47,15 @@ export function applyTradePropose(
   if (prior && prior.count >= 3) {
     throw new Error(`Trade already rejected 3 times this year`);
   }
+  // Horse trades are restricted to one horse on at most one side
+  // (Gettman's UI exposes only single-horse trades). Reject multi-horse
+  // or bidirectional-horse trades that the horseFrom/horseTo flow can't resolve.
+  if (give[4] > 1 || receive[4] > 1) {
+    throw new Error(`Trade limited to 1 horse per side`);
+  }
+  if (give[4] > 0 && receive[4] > 0) {
+    throw new Error(`Trade cannot have horses on both sides`);
+  }
   const proposerStock = prev.players[proposer]!.stockpile;
   if (!canCover(proposerStock, give)) {
     throw new Error(`Proposer has insufficient stockpile to give`);

@@ -17,7 +17,7 @@ const initial = (): GameState => ({
   setup, squares: [], territories: [], boats: [], players: [],
   touching: [], distance: [],
   turnOrder: [], currentPhase: 'setup', currentPlayer: 0,
-  year: 0, attackNumber: 1, shipmentUsed: false, shipmentForfeitsSecondAttack: false,
+  year: 0, attackNumber: 1, shipmentUsed: false, shipmentForfeitsSecondAttack: [],
   pendingTrade: null, pendingCombat: null,
   rejectedTrades: [], autoReject: [], log: [],
 });
@@ -29,7 +29,7 @@ function shipmentWithBoat(): { state: GameState; boatId: number; toX: number; to
     s = reduce(s, { kind: 'selection', player: s.currentPlayer, territoryId: free.id });
   }
   s = reduce(s, { kind: 'endPhase', player: s.currentPlayer });
-  s = { ...s, currentPhase: 'shipment', currentPlayer: 0, shipmentUsed: false, shipmentForfeitsSecondAttack: false };
+  s = { ...s, currentPhase: 'shipment', currentPlayer: 0, shipmentUsed: false, shipmentForfeitsSecondAttack: [] };
   const coastTerr = s.territories.find(
     (t) => t.ownerId === 0 && t.bordersLakes.size > 0,
   );

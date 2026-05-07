@@ -17,7 +17,7 @@ const initial = (): GameState => ({
   setup, squares: [], territories: [], boats: [], players: [],
   touching: [], distance: [],
   turnOrder: [], currentPhase: 'setup', currentPlayer: 0,
-  year: 0, attackNumber: 1, shipmentUsed: false, shipmentForfeitsSecondAttack: false,
+  year: 0, attackNumber: 1, shipmentUsed: false, shipmentForfeitsSecondAttack: [],
   pendingTrade: null, pendingCombat: null,
   rejectedTrades: [], autoReject: [], log: [],
 });
@@ -112,5 +112,27 @@ describe('trade propose', () => {
       kind: 'trade', proposer: s.currentPlayer, tradee: s.currentPlayer,
       give: give(1, 0, 0, 0, 0), receive: give(0, 0, 1, 0, 0),
     })).toThrow(/different player/i);
+  });
+});
+
+describe('horse-trade validation', () => {
+  it('rejects multi-horse give', () => {
+    const s = tradePhaseState();
+    s.players[s.currentPlayer]!.stockpile = give(0, 0, 0, 0, 2);
+    s.players[1]!.stockpile = give(2, 0, 0, 0, 0);
+    expect(() => reduce(s, {
+      kind: 'trade', proposer: s.currentPlayer, tradee: 1,
+      give: give(0, 0, 0, 0, 2), receive: give(1, 0, 0, 0, 0),
+    })).toThrow(/1 horse/i);
+  });
+
+  it('rejects horses on both sides', () => {
+    const s = tradePhaseState();
+    s.players[s.currentPlayer]!.stockpile = give(0, 0, 0, 0, 1);
+    s.players[1]!.stockpile = give(0, 0, 0, 0, 1);
+    expect(() => reduce(s, {
+      kind: 'trade', proposer: s.currentPlayer, tradee: 1,
+      give: give(0, 0, 0, 0, 1), receive: give(0, 0, 0, 0, 1),
+    })).toThrow(/both sides/i);
   });
 });

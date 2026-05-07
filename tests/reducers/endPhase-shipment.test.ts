@@ -17,7 +17,7 @@ const initial = (): GameState => ({
   setup, squares: [], territories: [], boats: [], players: [],
   touching: [], distance: [],
   turnOrder: [], currentPhase: 'setup', currentPlayer: 0,
-  year: 0, attackNumber: 1, shipmentUsed: false, shipmentForfeitsSecondAttack: false,
+  year: 0, attackNumber: 1, shipmentUsed: false, shipmentForfeitsSecondAttack: [],
   pendingTrade: null, pendingCombat: null,
   rejectedTrades: [], autoReject: [], log: [],
 });
@@ -29,7 +29,7 @@ function shipmentPhase(): GameState {
     s = reduce(s, { kind: 'selection', player: s.currentPlayer, territoryId: free.id });
   }
   s = reduce(s, { kind: 'endPhase', player: s.currentPlayer });
-  s = { ...s, currentPhase: 'shipment', currentPlayer: s.turnOrder[0]!, shipmentUsed: false, shipmentForfeitsSecondAttack: false };
+  s = { ...s, currentPhase: 'shipment', currentPlayer: s.turnOrder[0]!, shipmentUsed: false, shipmentForfeitsSecondAttack: [] };
   return s;
 }
 
@@ -51,7 +51,7 @@ describe('endPhase: shipment', () => {
     expect(s.currentPhase).toBe('conquest');
     expect(s.attackNumber).toBe(1);
     expect(s.shipmentUsed).toBe(false);
-    expect(s.shipmentForfeitsSecondAttack).toBe(false);
+    expect(s.shipmentForfeitsSecondAttack.every((x) => x === false)).toBe(true);
     expect(s.currentPlayer).toBe(s.turnOrder[0]!);
   });
 });

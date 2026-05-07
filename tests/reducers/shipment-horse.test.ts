@@ -16,7 +16,7 @@ const initial = (): GameState => ({
   setup, squares: [], territories: [], boats: [], players: [],
   touching: [], distance: [],
   turnOrder: [], currentPhase: 'setup', currentPlayer: 0,
-  year: 0, attackNumber: 1, shipmentUsed: false, shipmentForfeitsSecondAttack: false,
+  year: 0, attackNumber: 1, shipmentUsed: false, shipmentForfeitsSecondAttack: [],
   pendingTrade: null, pendingCombat: null,
   rejectedTrades: [], autoReject: [], log: [],
 });
@@ -28,7 +28,7 @@ function shipmentPhaseWithAdjacentOwned(): { state: GameState; from: number; to:
     s = reduce(s, { kind: 'selection', player: s.currentPlayer, territoryId: free.id });
   }
   s = reduce(s, { kind: 'endPhase', player: s.currentPlayer });
-  s = { ...s, currentPhase: 'shipment', currentPlayer: 0, shipmentUsed: false, shipmentForfeitsSecondAttack: false };
+  s = { ...s, currentPhase: 'shipment', currentPlayer: 0, shipmentUsed: false, shipmentForfeitsSecondAttack: [] };
   let from = -1, to = -1;
   for (let a = 0; a < s.territories.length; a++) {
     for (let b = 0; b < s.territories.length; b++) {
@@ -127,5 +127,13 @@ describe('shipHorse 2 hop', () => {
     s.territories[from]!.hasHorse = true;
     expect(() => reduce(s, { kind: 'shipHorse', player: 0, from, to, restStop }))
       .toThrow(/rest.?stop|owned/i);
+  });
+});
+
+describe('shipHorse: deferred features', () => {
+  it('throws when pickUpWeaponFrom is provided', () => {
+    const { state: s, from, to } = shipmentPhaseWithAdjacentOwned();
+    expect(() => reduce(s, { kind: 'shipHorse', player: 0, from, to, pickUpWeaponFrom: 5 }))
+      .toThrow(/not implemented/i);
   });
 });

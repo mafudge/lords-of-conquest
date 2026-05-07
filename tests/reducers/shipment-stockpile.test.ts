@@ -16,7 +16,7 @@ const initial = (): GameState => ({
   setup, squares: [], territories: [], boats: [], players: [],
   touching: [], distance: [],
   turnOrder: [], currentPhase: 'setup', currentPlayer: 0,
-  year: 0, attackNumber: 1, shipmentUsed: false, shipmentForfeitsSecondAttack: false,
+  year: 0, attackNumber: 1, shipmentUsed: false, shipmentForfeitsSecondAttack: [],
   pendingTrade: null, pendingCombat: null,
   rejectedTrades: [], autoReject: [], log: [],
 });
@@ -30,7 +30,7 @@ function shipmentPhase(): GameState {
     s = reduce(s, { kind: 'selection', player: s.currentPlayer, territoryId: free.id });
   }
   s = reduce(s, { kind: 'endPhase', player: s.currentPlayer });
-  s = { ...s, currentPhase: 'shipment', currentPlayer: 0, shipmentUsed: false, shipmentForfeitsSecondAttack: false };
+  s = { ...s, currentPhase: 'shipment', currentPlayer: 0, shipmentUsed: false, shipmentForfeitsSecondAttack: [] };
   const myTerr = s.territories.find((t) => t.ownerId === 0)!;
   s.territories[myTerr.id]!.hasStockpile = true;
   s.players[0]!.stockpileLocation = myTerr.id;
@@ -48,7 +48,7 @@ describe('shipStockpile', () => {
     expect(out.territories[from]!.hasStockpile).toBe(false);
     expect(out.territories[to]!.hasStockpile).toBe(true);
     expect(out.shipmentUsed).toBe(true);
-    expect(out.shipmentForfeitsSecondAttack).toBe(true);
+    expect(out.shipmentForfeitsSecondAttack[0]).toBe(true);
   });
 
   it('rejects when already shipped this turn', () => {

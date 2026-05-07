@@ -96,7 +96,7 @@ export function applyEndPhase(prev: GameState, _player: PlayerId): GameState {
           currentPhase: 'conquest',
           currentPlayer: prev.turnOrder[0]!,
           shipmentUsed: false,
-          shipmentForfeitsSecondAttack: false,
+          shipmentForfeitsSecondAttack: new Array<boolean>(prev.players.length).fill(false),
           attackNumber: 1,
           log: [
             ...prev.log,
@@ -111,7 +111,7 @@ export function applyEndPhase(prev: GameState, _player: PlayerId): GameState {
         currentPhase: 'shipment',
         currentPlayer: prev.turnOrder[0]!,
         shipmentUsed: false,
-        shipmentForfeitsSecondAttack: false,
+        shipmentForfeitsSecondAttack: new Array<boolean>(prev.players.length).fill(false),
         log: [
           ...prev.log,
           { year: prev.year, phase: 'shipment', player: prev.turnOrder[0]!,
@@ -127,7 +127,6 @@ export function applyEndPhase(prev: GameState, _player: PlayerId): GameState {
           ...prev,
           currentPlayer: prev.turnOrder[nextIdx]!,
           shipmentUsed: false,
-          shipmentForfeitsSecondAttack: false,
           log: [
             ...prev.log,
             { year: prev.year, phase: 'shipment', player: prev.turnOrder[nextIdx]!,
@@ -141,7 +140,6 @@ export function applyEndPhase(prev: GameState, _player: PlayerId): GameState {
         currentPlayer: prev.turnOrder[0]!,
         attackNumber: 1,
         shipmentUsed: false,
-        shipmentForfeitsSecondAttack: false,
         log: [
           ...prev.log,
           { year: prev.year, phase: 'conquest', player: prev.turnOrder[0]!,

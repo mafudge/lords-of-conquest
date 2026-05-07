@@ -63,7 +63,7 @@ export function applyNewGame(
     year: 1,
     attackNumber: 1,
     shipmentUsed: false,
-    shipmentForfeitsSecondAttack: false,
+    shipmentForfeitsSecondAttack: new Array<boolean>(n).fill(false),
     pendingTrade: null,
     pendingCombat: null,
     rejectedTrades: [],

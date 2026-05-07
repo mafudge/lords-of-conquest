@@ -1,6 +1,12 @@
 import type { GameState, PlayerId, Stockpile } from '../types.js';
 import { GRID_WIDTH } from '../constants.js';
 
+// NOTE FOR PLAN 4: LocApplet.java L2105-2113 enables the "Move Stockpile"
+// button only during Conquest Attack #2, suggesting stockpile-move is a
+// Conquest-phase between-attacks action rather than a Shipment-phase action.
+// Plan 4's conquest implementation should verify against the Java source
+// and may need to relocate this handler from Shipment to Conquest, with
+// the "forfeits 2nd attack" semantic falling out naturally.
 export function applyShipStockpile(
   prev: GameState,
   player: PlayerId,
@@ -31,12 +37,14 @@ export function applyShipStockpile(
   const players = prev.players.map((p) =>
     p.id === player ? { ...p, stockpileLocation: to } : p,
   );
+  const newForfeits = [...prev.shipmentForfeitsSecondAttack];
+  newForfeits[player] = true;
   return {
     ...prev,
     territories,
     players,
     shipmentUsed: true,
-    shipmentForfeitsSecondAttack: true,
+    shipmentForfeitsSecondAttack: newForfeits,
     log: [
       ...prev.log,
       { year: prev.year, phase: 'shipment', player,
@@ -64,6 +72,9 @@ export function applyShipHorse(prev: GameState, input: ShipHorseInput): GameStat
     throw new Error(`shipHorse by player ${input.player} but current is ${prev.currentPlayer}`);
   }
   if (prev.shipmentUsed) throw new Error(`Already shipped this turn`);
+  if (input.pickUpWeaponFrom !== undefined || input.moveWeaponTo !== undefined) {
+    throw new Error(`shipHorse with pickUpWeaponFrom/moveWeaponTo is not implemented (deferred to UI polish)`);
+  }
   const fromT = prev.territories[input.from];
   const toT = prev.territories[input.to];
   if (!fromT || !toT) throw new Error(`Invalid territory id`);
