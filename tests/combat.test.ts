@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { getCombatStrength } from '../src/game/combat.js';
+import { getCombatStrength, isAutoPreventSuicide } from '../src/game/combat.js';
 import type { GameState, CombatState, Territory } from '../src/game/types.js';
 
 function stateWithForce(perPlayerForces: Record<number, number>): GameState {
@@ -116,5 +116,21 @@ describe('getCombatStrength', () => {
     const r = getCombatStrength(s, c);
     expect(r.attackerStrength).toBe(1);
     expect(r.defenderStrength).toBe(1);
+  });
+});
+
+describe('isAutoPreventSuicide', () => {
+  it('blocks at Low when attacker + 6 < defender', () => {
+    expect(isAutoPreventSuicide('low', 1, 8)).toBe(true);
+    expect(isAutoPreventSuicide('low', 2, 8)).toBe(false);
+  });
+
+  it('blocks at Medium when attacker + 6 < defender', () => {
+    expect(isAutoPreventSuicide('medium', 1, 8)).toBe(true);
+    expect(isAutoPreventSuicide('medium', 3, 8)).toBe(false);
+  });
+
+  it('never blocks at High', () => {
+    expect(isAutoPreventSuicide('high', 1, 999)).toBe(false);
   });
 });
