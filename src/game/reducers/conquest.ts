@@ -124,17 +124,7 @@ export function applyAttack(prev: GameState, input: AttackInput): GameState {
   };
   const midState: GameState = { ...prev, territories, pendingCombat: partial };
   const { attackerStrength, defenderStrength } = getCombatStrength(midState, partial);
-  let attBonus = 0;
-  if (input.boatId !== null) attBonus += 2;
-  if (input.horseFromTerritoryId !== null) {
-    const adjAlready = prev.touching[input.horseFromTerritoryId]?.[input.targetTerritoryId];
-    if (!adjAlready) attBonus += 1;
-  }
-  if (input.weaponFromTerritoryId !== null) {
-    const adjAlready = prev.touching[input.weaponFromTerritoryId]?.[input.targetTerritoryId];
-    if (!adjAlready) attBonus += 3;
-  }
-  const finalAttackerStrength = attackerStrength + attBonus;
+  const finalAttackerStrength = attackerStrength + bringForcesBonus(prev, partial);
   if (isAutoPreventSuicide(prev.setup.elementOfChance, finalAttackerStrength, defenderStrength)) {
     throw new Error(`Attack auto-prevented (suicide check at ${prev.setup.elementOfChance} chance)`);
   }
