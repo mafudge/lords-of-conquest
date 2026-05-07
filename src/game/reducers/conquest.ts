@@ -240,13 +240,39 @@ export function applyResolveCombat(prev: GameState): GameState {
     };
     return applyPostAttackWin(intermediate, c);
   }
-  return {
-    ...prev,
-    rngCursor: nextRngCursor,
+  const intermediateLoss: GameState = {
+    ...prev, rngCursor: nextRngCursor,
     pendingCombat: { ...c, resolved: true, attackerWon },
+  };
+  return applyPostAttackLoss(intermediateLoss, c, probMsg);
+}
+
+function applyPostAttackLoss(
+  state: GameState,
+  c: NonNullable<GameState['pendingCombat']>,
+  probMsg: string,
+): GameState {
+  let boats = state.boats;
+  if (c.boatId !== null) {
+    const bid = c.boatId;
+    boats = state.boats.map((b, i) => i === bid ? null : b);
+  }
+  let players = state.players;
+  if (c.horseFromTerritoryId !== null) {
+    players = players.map((p) => {
+      if (p.id !== c.attackerId) return p;
+      const stock: typeof p.stockpile = [...p.stockpile] as typeof p.stockpile;
+      stock[4] = Math.max(0, stock[4] - 1);
+      return { ...p, stockpile: stock };
+    });
+  }
+  return {
+    ...state,
+    boats,
+    players,
     log: [
-      ...prev.log,
-      { year: prev.year, phase: 'conquest', player: c.attackerId,
+      ...state.log,
+      { year: state.year, phase: 'conquest', player: c.attackerId,
         message: `Combat resolved: attacker lost${probMsg}` },
     ],
   };
