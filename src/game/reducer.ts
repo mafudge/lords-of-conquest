@@ -9,10 +9,9 @@ import { applyLoadmap } from './reducers/loadmap.js';
 import { applyTradePropose, applyTradeResponse, applyHorseFrom, applyHorseTo, applyTradeRejectAll } from './reducers/trade.js';
 import { applyShipStockpile, applyShipHorse, applyShipWeapon, applyShipBoat } from './reducers/shipment.js';
 import { applyAttack, applyAlliesDecision, applyResolveCombat } from './reducers/conquest.js';
+import { applyBuildCity, applyBuildWeapon, applyBuildBoat } from './reducers/development.js';
 
-const NOT_IMPLEMENTED_KINDS: ReadonlyArray<Plan['kind']> = [
-  'buildCity', 'buildWeapon', 'buildBoat',
-];
+const NOT_IMPLEMENTED_KINDS: ReadonlyArray<Plan['kind']> = [];
 
 export function reduce(state: GameState, plan: Plan): GameState {
   switch (plan.kind) {
@@ -54,6 +53,12 @@ export function reduce(state: GameState, plan: Plan): GameState {
       return applyAlliesDecision(state, plan.player, plan.choice);
     case 'resolveCombat':
       return applyResolveCombat(state);
+    case 'buildCity':
+      return applyBuildCity(state, plan.player, plan.territoryId, plan.payInGold);
+    case 'buildWeapon':
+      return applyBuildWeapon(state, plan.player, plan.territoryId, plan.payInGold);
+    case 'buildBoat':
+      return applyBuildBoat(state, plan.player, plan.territoryId, plan.lakeId, plan.payInGold);
     default: {
       // Distinguish between "Plan 3 territory" and "completely unknown"
       const kind = (plan as { kind?: string }).kind;
