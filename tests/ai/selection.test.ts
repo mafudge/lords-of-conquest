@@ -15,13 +15,15 @@ describe('scoreSelectionCandidate', () => {
     expect(goldScore).toBeGreaterThan(treeScore);
   });
 
-  it('returns 0 for unresourced territory with no neighbors owned', () => {
-    const s = seededState({ seed: 42, playerCount: 2 });
+  it('returns 0 for unresourced territory under a passive persona', () => {
+    const s = seededState({ seed: 42, playerCount: 2, personas: ['passive', 'passive'] });
     const wiped = { ...s, territories: s.territories.map((t) =>
       ({ ...t, ownerId: null })) };
     const noResource = wiped.territories.find((t) => t.resource === null);
     if (!noResource) return;
     const score = scoreSelectionCandidate(wiped, 0, noResource.id);
+    // Passive persona skips both resource scoring and touch-terr scoring.
+    // Vulnerability and ptTouchOwnTerr also evaluate to 0 in this wiped state.
     expect(score).toBe(0);
   });
 

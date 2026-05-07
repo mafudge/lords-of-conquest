@@ -106,13 +106,12 @@ export function scoreSelectionCandidate(
     }
   }
 
-  // Adjacent unowned-territory bonus (LocAI L2875–L2887)
-  // Only when persona != passive (n2 != 1) and the candidate itself has a resource.
-  // (In the original Java this is guarded only by n2 != 1; restricting to
-  //  resource-bearing candidates aligns with expected scoring behaviour and
-  //  ensures a no-resource territory with no owned neighbours scores 0.)
-  if ((persona === PERSONA_DEFENSIVE || persona === PERSONA_AGGRESSIVE) &&
-      territory.resource !== null) {
+  // Adjacent unowned-territory bonus (LocAI L2875–L2887). Persona gate: n2 != 1
+  // means non-passive only (defensive or aggressive). Adds ptTouchTerr per
+  // adjacent unowned territory; +ptTouchTerrWResource if that neighbor has a
+  // resource. Note: this loop scores the candidate based on its UNOWNED
+  // neighbors regardless of whether the candidate itself has a resource.
+  if (persona === PERSONA_DEFENSIVE || persona === PERSONA_AGGRESSIVE) {
     const n = state.territories.length;
     for (let i = 0; i < n; i++) {
       const neighbor = state.territories[i];
