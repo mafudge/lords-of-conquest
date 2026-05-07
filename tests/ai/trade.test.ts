@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { decideTradeAction } from '../../src/game/ai/trade.js';
+import { decideTradeAction, getProposedTradePlan } from '../../src/game/ai/trade.js';
 import { seededState, setStockpile } from './_fixtures.js';
 
 describe('decideTradeAction', () => {
@@ -39,5 +39,40 @@ describe('decideTradeAction', () => {
       give: [9, 9, 9, 9, 9], receive: [0, 0, 0, 0, 0],
       status: 'proposed',
     })).toBe(false);
+  });
+});
+
+describe('getProposedTradePlan', () => {
+  it('generates a candidate or endPhase when both sides have stockpile cover', () => {
+    let s = seededState({ seed: 42 });
+    s = setStockpile(s, 0, [3, 0, 0, 0, 0]);
+    s = setStockpile(s, 1, [0, 3, 0, 0, 0]);
+    s = { ...s, currentPhase: 'trade', currentPlayer: 0, pendingTrade: null };
+    const plan = getProposedTradePlan(s, 0);
+    expect(['trade', 'endPhase']).toContain(plan.kind);
+  });
+
+  it('returns endPhase when every opponent is passive (rejects everything)', () => {
+    let s = seededState({ seed: 42, personas: ['aggressive', 'passive', 'passive'] });
+    s = setStockpile(s, 0, [3, 0, 0, 0, 0]);
+    s = setStockpile(s, 1, [0, 3, 0, 0, 0]);
+    s = setStockpile(s, 2, [0, 3, 0, 0, 0]);
+    s = { ...s, currentPhase: 'trade', currentPlayer: 0, pendingTrade: null };
+    const plan = getProposedTradePlan(s, 0);
+    expect(plan.kind).toBe('endPhase');
+  });
+
+  it('skips opponents who have set autoReject for me', () => {
+    let s = seededState({ seed: 42 });
+    s = setStockpile(s, 0, [3, 0, 0, 0, 0]);
+    s = setStockpile(s, 1, [0, 3, 0, 0, 0]);
+    s = { ...s,
+      currentPhase: 'trade', currentPlayer: 0, pendingTrade: null,
+      autoReject: [[false, false, false], [true, false, false], [false, false, false]],
+    };
+    const plan = getProposedTradePlan(s, 0);
+    if (plan.kind === 'trade') {
+      expect(plan.tradee).not.toBe(1);
+    }
   });
 });

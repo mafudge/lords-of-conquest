@@ -33,8 +33,6 @@ describe('decideAction skeleton', () => {
   });
 
   it('throws "not implemented yet" for phases not yet wired', () => {
-    expect(() => decideAction(bareState('trade'), 0))
-      .toThrow(/not implemented yet/i);
     expect(() => decideAction(bareState('conquest'), 0))
       .toThrow(/not implemented yet/i);
   });

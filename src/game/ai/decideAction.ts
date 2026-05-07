@@ -3,6 +3,7 @@ import type { Plan } from '../plans.js';
 import { decideSelectionAction } from './selection.js';
 import { decideDevelopmentAction } from './development.js';
 import { decideShipmentAction } from './shipment.js';
+import { getProposedTradePlan } from './trade.js';
 
 export function decideAction(state: GameState, player: PlayerId): Plan {
   switch (state.currentPhase) {
@@ -13,7 +14,7 @@ export function decideAction(state: GameState, player: PlayerId): Plan {
       // directly; if decideAction is reached for production the caller is wrong.
       throw new Error(`decideAction should not be called for production phase`);
     case 'trade':
-      throw new Error(`trade AI not implemented yet`);
+      return getProposedTradePlan(state, player);
     case 'shipment':
       return decideShipmentAction(state, player);
     case 'conquest':
