@@ -4,6 +4,7 @@ import { applyNewGame } from './reducers/newGame.js';
 import { applySelection } from './reducers/selection.js';
 import { applyEndPhase } from './reducers/endPhase.js';
 import { applyProduction } from './reducers/production.js';
+import { applySavegame, applyLoadgame } from './reducers/persistence.js';
 
 const NOT_IMPLEMENTED_KINDS: ReadonlyArray<Plan['kind']> = [
   'trade', 'tradeResponse', 'tradeRejectAll', 'horseFrom', 'horseTo',
@@ -21,7 +22,9 @@ export function reduce(state: GameState, plan: Plan): GameState {
     case 'production':
       return applyProduction(state);
     case 'savegame':
+      return applySavegame(state, plan.slot);
     case 'loadgame':
+      return applyLoadgame(state, plan.state);
     case 'loadmap':
       throw new Error(`Reducer dispatch for ${plan.kind} is wired in a later task`);
     case 'endPhase':
