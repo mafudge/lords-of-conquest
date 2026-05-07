@@ -36,11 +36,20 @@ export function runAITurn(state: GameState): GameState {
       return s; // human ally still pending
     }
 
+    // Combat resolved but endPhase not yet called — advance turn.
+    if (s.pendingCombat && s.pendingCombat.resolved) {
+      s = reduce(s, { kind: 'endPhase', player: s.currentPlayer });
+      continue;
+    }
+
     if (s.players[s.currentPlayer]!.persona === 'human') return s;
 
     if (s.currentPhase === 'production') {
-      const plan: Plan = { kind: 'production' };
-      s = reduce(s, plan);
+      s = reduce(s, { kind: 'production' });
+      // After the production tick the phase stays 'production'; endPhase advances to trade/shipment.
+      if (s.currentPhase === 'production') {
+        s = reduce(s, { kind: 'endPhase', player: s.currentPlayer });
+      }
       continue;
     }
 
