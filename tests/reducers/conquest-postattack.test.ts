@@ -141,3 +141,27 @@ describe('post-attack: horse and weapon transfer', () => {
     expect(out.territories[target]!.hasWeapon).toBe(true);
   });
 });
+
+describe('post-attack: stockpile transfer', () => {
+  it('captures defender stockpile slots 0-3 when target held the stockpile', () => {
+    const { state: s, target } = combatReady(5, 3);
+    s.territories[target]!.hasStockpile = true;
+    s.players[1]!.stockpileLocation = target;
+    s.players[1]!.stockpile = [3, 2, 1, 4, 7];
+    s.players[0]!.stockpile = [1, 1, 1, 1, 0];
+    const out = reduce(s, { kind: 'resolveCombat' });
+    expect(out.players[0]!.stockpile.slice(0, 4)).toEqual([4, 3, 2, 5]);
+    expect(out.players[1]!.stockpile.slice(0, 4)).toEqual([0, 0, 0, 0]);
+    expect(out.players[1]!.stockpile[4]).toBe(7);
+    expect(out.territories[target]!.hasStockpile).toBe(false);
+    expect(out.players[1]!.stockpileLocation).toBeNull();
+  });
+
+  it('does nothing if target did not hold the stockpile', () => {
+    const { state: s, target } = combatReady(5, 3);
+    s.territories[target]!.hasStockpile = false;
+    s.players[1]!.stockpile = [3, 2, 1, 4, 0];
+    const out = reduce(s, { kind: 'resolveCombat' });
+    expect(out.players[1]!.stockpile).toEqual([3, 2, 1, 4, 0]);
+  });
+});
