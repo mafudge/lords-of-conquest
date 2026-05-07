@@ -20,11 +20,11 @@ export function getForceCount(state: GameState, terrId: number): ForceCount {
     if (t.hasHorse) contribution += 1;
     if (t.hasCity) contribution += 2;
     if (t.hasWeapon) contribution += 3;
-    perPlayer[t.ownerId] += contribution;
+    perPlayer[t.ownerId]! += contribution;
     if (isCenter) {
       // Boats on the central tile only
       const boats = state.boats.filter((b) => b !== null && b.homeTerritoryId === tid && b.ownerId === t.ownerId);
-      perPlayer[t.ownerId] += 2 * boats.length;
+      perPlayer[t.ownerId]! += 2 * boats.length;
     }
   };
 
