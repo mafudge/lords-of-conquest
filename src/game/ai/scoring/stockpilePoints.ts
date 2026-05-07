@@ -1,5 +1,6 @@
 import type { GameState, PlayerId, Stockpile } from '../../types.js';
 import { ptCanBuildCity, ptCanBuildWeapon, ptCanBuildBoat } from '../../aiConstants.js';
+import { getTerrNoHorseToPlace, getTerrNoHorseToRemove } from './horseMoveUtility.js';
 
 /**
  * Score a (possibly hypothetical) stockpile for a player.
@@ -11,9 +12,8 @@ import { ptCanBuildCity, ptCanBuildWeapon, ptCanBuildBoat } from '../../aiConsta
  *   int[][] nArray → bfPossible (passed through; not actually read by this function)
  *   this.pl        → player   (same value; used for getItemVacancyCount)
  *
- * Horse term (LocAI L1297-L1306) — requires horsePlaceTerrNo/horseRemoveTerrNo computed
- * by getTerrNoHorseToPlace / getTerrNoHorseToRemove — stubbed to 0.
- * TODO Task 20: wire in getTerrNoHorseToPlace / getTerrNoHorseToRemove.
+ * Horse term (LocAI L1297-L1306) — computed via getTerrNoHorseToPlace /
+ * getTerrNoHorseToRemove (Task 20).
  */
 export function getStockpilePoints(
   state: GameState,
@@ -21,10 +21,6 @@ export function getStockpilePoints(
   stockpile: Stockpile,
   bfPossible: number[][],
 ): number {
-  // Suppress unused-variable warning for bfPossible — it's part of the public
-  // signature to match the Java call-site convention; not used in this function.
-  void bfPossible;
-
   let n2 = 0;
 
   // Unpack resources: 0=iron, 1=coal, 2=tree, 3=gold, 4=stable
@@ -63,18 +59,30 @@ export function getStockpilePoints(
   const n20 = Math.trunc((n5 - n10) / 3); // floor((tree - n10) / 3)
   n2 += n20 * ptCanBuildBoat;
 
-  // Horse term — requires getTerrNoHorseToPlace / getTerrNoHorseToRemove.
+  // Horse term — LocAI L1297-L1306.
   // n21 = current stables in player's actual stockpile (resource index 4).
-  // n22 = proposed stables - current stables (positive = we're gaining horses,
-  //       negative = we're giving horses away).
-  // TODO Task 20: implement getTerrNoHorseToPlace / getTerrNoHorseToRemove and
-  //   replace these stubs with real horsePlaceTerrNo / horseRemoveTerrNo checks.
-  //   Java: LocAI L1297-L1306
-  //   const n21 = state.players[player]?.stockpile[4] ?? 0;
-  //   const n22 = n7 - n21;
-  //   const n23 = 10;
-  //   if (n22 > 0 && horsePlaceTerrNo > -1) { n2 += horsePlaceUtility / n23; }
-  //   else if (n22 < 0 && horseRemoveTerrNo > -1) { n2 += horseRemoveUtility / n23; }
+  // n22 = proposed stables - current stables (positive = gaining horses, negative = giving away).
+  // n23 = divisor 10.
+  const n21 = state.players[player]?.stockpile[4] ?? 0;
+  const n22 = n7 - n21;
+  const n23 = 10;
+  if (n22 > 0) {
+    // horsePlaceTerrNo: return territory id (isAddingFromStockpile=false → Java n2==0 → terrId).
+    const horsePlaceTerrNo = getTerrNoHorseToPlace(state, player, bfPossible, false);
+    if (horsePlaceTerrNo > -1) {
+      // horsePlaceUtility: return score (isAddingFromStockpile=true → Java n2!=0 → score).
+      const horsePlaceUtility = getTerrNoHorseToPlace(state, player, bfPossible, true);
+      n2 += Math.trunc(horsePlaceUtility / n23);
+    }
+  } else if (n22 < 0) {
+    // horseRemoveTerrNo: return territory id (considerNothing=false → Java n2==0 → terrId).
+    const horseRemoveTerrNo = getTerrNoHorseToRemove(state, player, -1, bfPossible, false);
+    if (horseRemoveTerrNo > -1) {
+      // horseRemoveUtility: return score (considerNothing=true → Java n2!=0 → score).
+      const horseRemoveUtility = getTerrNoHorseToRemove(state, player, -1, bfPossible, true);
+      n2 += Math.trunc(horseRemoveUtility / n23);
+    }
+  }
 
   return n2;
 }
