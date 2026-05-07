@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { placeResourcesFixed } from '../../src/game/mapgen/resources.js';
+import { placeResourcesFixed, placeResourcesRandom, RESOURCE_ORDER } from '../../src/game/mapgen/resources.js';
 import { Code } from '../../src/game/codes.js';
 import { createRng } from '../../src/game/rng.js';
 import type { Territory } from '../../src/game/types.js';
@@ -45,5 +45,32 @@ describe('placeResourcesFixed', () => {
     const terrs = makeTerrs(5); // need at least 4*5 + (1 if medium) = 21
     expect(() => placeResourcesFixed(terrs, 'medium', 4, createRng(3)))
       .toThrow(/not enough territories/i);
+  });
+});
+
+describe('placeResourcesRandom', () => {
+  it('exposes resourceOrder = [TREE, GOLD, STABLE, IRON, COAL]', () => {
+    expect(RESOURCE_ORDER).toEqual([
+      Code.TREE, Code.GOLD, Code.STABLE, Code.IRON, Code.COAL,
+    ]);
+  });
+
+  it('places resources on roughly the right fraction of territories', () => {
+    const terrs = makeTerrs(50);
+    const r = createRng(5);
+    placeResourcesRandom(terrs, 'medium', r); // 0.50 fraction
+    const placed = terrs.filter((t) => t.resource !== null).length;
+    expect(placed).toBeGreaterThanOrEqual(24);
+    expect(placed).toBeLessThanOrEqual(26);
+  });
+
+  it('"high" places more than "low"', () => {
+    const a = makeTerrs(50);
+    placeResourcesRandom(a, 'high', createRng(6));
+    const b = makeTerrs(50);
+    placeResourcesRandom(b, 'low', createRng(6));
+    const placedA = a.filter((t) => t.resource !== null).length;
+    const placedB = b.filter((t) => t.resource !== null).length;
+    expect(placedA).toBeGreaterThan(placedB);
   });
 });

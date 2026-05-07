@@ -39,3 +39,46 @@ export function placeResourcesFixed(
     }
   }
 }
+
+// LocApplet L7247-7252: resourceOrder = {2, 3, 4, 0, 1}
+export const RESOURCE_ORDER: readonly ResourceCode[] = [
+  Code.TREE, Code.GOLD, Code.STABLE, Code.IRON, Code.COAL,
+];
+
+const RANDOM_LEVEL_FRACTION: Record<ResourceDensity['level'], number> = {
+  veryLow: 0.20,
+  low: 0.35,
+  medium: 0.50,
+  high: 0.65,
+};
+
+export function placeResourcesRandom(
+  terrs: Territory[],
+  level: ResourceDensity['level'],
+  r: RngState,
+): void {
+  const target = Math.round(terrs.length * RANDOM_LEVEL_FRACTION[level]);
+  const free: Territory[] = terrs.filter((t) => t.resource === null);
+  // Shuffle
+  for (let i = free.length - 1; i > 0; i--) {
+    const j = nextInt(r, i + 1);
+    [free[i], free[j]] = [free[j]!, free[i]!];
+  }
+  // Round-robin via RESOURCE_ORDER until target placed (or out of free terrs).
+  let cursor = 0;
+  let orderIdx = 0;
+  while (cursor < target && cursor < free.length) {
+    free[cursor++]!.resource = RESOURCE_ORDER[orderIdx]!;
+    orderIdx = (orderIdx + 1) % RESOURCE_ORDER.length;
+  }
+}
+
+export function placeResources(
+  terrs: Territory[],
+  density: ResourceDensity,
+  numPlayers: number,
+  r: RngState,
+): void {
+  if (density.kind === 'fixed') placeResourcesFixed(terrs, density.level, numPlayers, r);
+  else placeResourcesRandom(terrs, density.level, r);
+}
