@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { combination } from '../src/game/locProb.js';
 import { probSuccess } from '../src/game/locProb.js';
+import { createRng, nextFloat } from '../src/game/rng.js';
 
 describe('combination', () => {
   it('C(n, 0) = 1', () => {
@@ -62,5 +63,31 @@ describe('probSuccess general case', () => {
   it('matches Gettman formula for 4v2', () => {
     // (C(5,0)+C(5,1)+C(5,2)+C(5,3))/32 = (1+5+10+10)/32 = 26/32 = 0.8125
     expect(probSuccess(4, 2)).toBeCloseTo(0.8125, 10);
+  });
+});
+
+function simulateBattle(att: number, def: number, r: ReturnType<typeof createRng>): boolean {
+  let a = att;
+  let d = def;
+  while (a > 0 && d > 0) {
+    if (nextFloat(r) < 0.5) a--;
+    else d--;
+  }
+  return d === 0;
+}
+
+describe('probSuccess Monte-Carlo parity', () => {
+  it.each([
+    [2, 3], [3, 2], [4, 4], [5, 7], [10, 8],
+  ])('closed-form ≈ simulation for %i vs %i', (att, def) => {
+    const r = createRng(0xCAFE);
+    const trials = 20_000;
+    let wins = 0;
+    for (let i = 0; i < trials; i++) {
+      if (simulateBattle(att, def, r)) wins++;
+    }
+    const empirical = wins / trials;
+    const closedForm = probSuccess(att, def);
+    expect(Math.abs(empirical - closedForm)).toBeLessThan(0.02);
   });
 });
