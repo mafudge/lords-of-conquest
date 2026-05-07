@@ -2,6 +2,8 @@ import type { GameState, PlayerId } from '../types.js';
 import { PHASE_SKIP_PROBABILITY } from '../constants.js';
 import { nextFloat } from '../rng.js';
 import { pickReason } from '../reasons.js';
+import { checkEndOfGame } from '../checkEndOfGame.js';
+import { applyYearWrap } from './yearWrap.js';
 
 export function applyEndPhase(prev: GameState, _player: PlayerId): GameState {
   switch (prev.currentPhase) {
@@ -209,19 +211,19 @@ export function applyEndPhase(prev: GameState, _player: PlayerId): GameState {
           ],
         };
       }
-      return {
-        ...prev,
-        currentPhase: 'production',
-        currentPlayer: prev.turnOrder[0]!,
-        year: prev.year + 1,
-        attackNumber: 1,
-        shipmentUsed: false,
-        log: [
-          ...prev.log,
-          { year: prev.year + 1, phase: 'production', player: prev.turnOrder[0]!,
-            message: 'Year wrap; new year begins' },
-        ],
-      };
+      const winner = checkEndOfGame(prev);
+      if (winner !== null) {
+        return {
+          ...prev,
+          currentPhase: 'gameOver',
+          log: [
+            ...prev.log,
+            { year: prev.year, phase: 'gameOver', player: winner,
+              message: `Player ${winner} won the game (year ${prev.year})` },
+          ],
+        };
+      }
+      return applyYearWrap(prev);
     }
     default:
       throw new Error(`endPhase from ${prev.currentPhase} is not implemented in plan 2 (Plan 3 territory)`);
