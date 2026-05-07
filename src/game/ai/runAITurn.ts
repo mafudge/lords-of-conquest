@@ -3,12 +3,9 @@ import type { Plan } from '../plans.js';
 import { reduce } from '../reducer.js';
 import { decideAction } from './decideAction.js';
 import { decideTradeAction } from './trade.js';
+import { decideAlliesAction } from './conquest.js';
 
 const MAX_ITER = 1000;
-
-function decideAlliesActionStub(): 'attacker' | 'neutral' | 'defender' {
-  throw new Error('decideAlliesAction not implemented yet (Task 22)');
-}
 
 export function runAITurn(state: GameState): GameState {
   let s = state;
@@ -28,7 +25,7 @@ export function runAITurn(state: GameState): GameState {
       const pendingNonHuman = [...s.pendingCombat.alliesPending]
         .find((p) => s.players[p]!.persona !== 'human');
       if (pendingNonHuman !== undefined) {
-        const choice = decideAlliesActionStub();
+        const choice = decideAlliesAction(s, pendingNonHuman, s.pendingCombat);
         s = reduce(s, { kind: 'alliesDecision', player: pendingNonHuman, choice });
         continue;
       }

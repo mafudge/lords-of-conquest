@@ -4,3 +4,4 @@ export { decideSelectionAction } from './selection.js';
 export { decideDevelopmentAction } from './development.js';
 export { decideShipmentAction } from './shipment.js';
 export { decideTradeAction, getProposedTradePlan } from './trade.js';
+export { decideAlliesAction } from './conquest.js';
