@@ -30,7 +30,7 @@ function emptyState(numPlayers: number, numTerritories: number, touching: boolea
     touching, distance: [],
     boats: new Array(256).fill(null), players,
     turnOrder: players.map((p) => p.id), currentPhase: 'production',
-    currentPlayer: 0, year: 1, attackNumber: 1, shipmentUsed: false,
+    currentPlayer: 0, year: 1, attackNumber: 1, shipmentUsed: false, shipmentForfeitsSecondAttack: [],
     pendingTrade: null, pendingCombat: null,
     rejectedTrades: [], autoReject: Array.from({ length: numPlayers }, () => new Array(numPlayers).fill(false)),
     log: [],

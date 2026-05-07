@@ -21,7 +21,7 @@ const initial = (): GameState => ({
   setup, squares: [], territories: [], boats: [], players: [],
   touching: [], distance: [],
   turnOrder: [], currentPhase: 'setup', currentPlayer: 0,
-  year: 0, attackNumber: 1, shipmentUsed: false,
+  year: 0, attackNumber: 1, shipmentUsed: false, shipmentForfeitsSecondAttack: [],
   pendingTrade: null, pendingCombat: null,
   rejectedTrades: [], autoReject: [], log: [],
 });
@@ -51,7 +51,7 @@ describe('endPhase: selection → production', () => {
       .toThrow(/unowned territories/i);
   });
 
-  it('rejects endPhase from a phase Plan 2 does not handle', () => {
+  it('endPhase from production advances to trade or shipment (Plan 3)', () => {
     let s = reduce(initial(), { kind: 'newGame', setup, seed: 7 });
     // Drain selection
     for (let i = 0; i < 24; i++) {
@@ -60,8 +60,10 @@ describe('endPhase: selection → production', () => {
       s = reduce(s, { kind: 'selection', player: s.currentPlayer, territoryId: free.id });
     }
     s = reduce(s, { kind: 'endPhase', player: s.currentPlayer });
-    // Now in production; endPhase from production is not in Plan 2
-    expect(() => reduce(s, { kind: 'endPhase', player: s.currentPlayer }))
-      .toThrow(/not implemented|production/i);
+    // Now in production; trigger a production tick then endPhase
+    s = reduce(s, { kind: 'production' });
+    if (s.currentPhase === 'trade') s = { ...s, currentPhase: 'production' };
+    const out = reduce(s, { kind: 'endPhase', player: s.currentPlayer });
+    expect(['trade', 'shipment']).toContain(out.currentPhase);
   });
 });

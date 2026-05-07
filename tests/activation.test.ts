@@ -22,7 +22,7 @@ function makeState(touching: boolean[][], territories: Partial<Territory>[]): Ga
     boats: new Array(256).fill(null),
     players: [],
     turnOrder: [], currentPhase: 'production', currentPlayer: 0,
-    year: 1, attackNumber: 1, shipmentUsed: false,
+    year: 1, attackNumber: 1, shipmentUsed: false, shipmentForfeitsSecondAttack: [],
     pendingTrade: null, pendingCombat: null,
     rejectedTrades: [], autoReject: [], log: [],
   };

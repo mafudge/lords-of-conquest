@@ -38,7 +38,7 @@ const initial = (): GameState => ({
   setup, squares: [], territories: [], boats: [], players: [],
   touching: [], distance: [],
   turnOrder: [], currentPhase: 'setup', currentPlayer: 0,
-  year: 0, attackNumber: 1, shipmentUsed: false,
+  year: 0, attackNumber: 1, shipmentUsed: false, shipmentForfeitsSecondAttack: [],
   pendingTrade: null, pendingCombat: null,
   rejectedTrades: [], autoReject: [], log: [],
 });
@@ -90,4 +90,28 @@ for (const t of s.territories) {
     console.log(`  T${t.id} (${owner})`);
   }
 }
-console.log(`\nFinal phase: ${s.currentPhase}`);
+// --- Trade & Shipment ---
+console.log('\n--- End-of-production transition ---');
+s = reduce(s, { kind: 'endPhase', player: s.currentPlayer });
+console.log(`Phase after endPhase from production: ${s.currentPhase}`);
+
+if (s.currentPhase === 'trade') {
+  console.log('\n--- Trade phase (each player ends in turn) ---');
+  for (let i = 0; i < s.players.length; i++) {
+    s = reduce(s, { kind: 'endPhase', player: s.currentPlayer });
+    console.log(`Player ${s.players[s.currentPlayer]!.name} now active; phase=${s.currentPhase}`);
+    if (s.currentPhase !== 'trade') break;
+  }
+}
+
+if (s.currentPhase === 'shipment') {
+  console.log('\n--- Shipment phase (each player ends in turn) ---');
+  for (let i = 0; i < s.players.length; i++) {
+    s = reduce(s, { kind: 'endPhase', player: s.currentPlayer });
+    console.log(`Player ${s.players[s.currentPlayer]!.name} now active; phase=${s.currentPhase}`);
+    if (s.currentPhase !== 'shipment') break;
+  }
+}
+
+console.log(`\nFinal phase reached: ${s.currentPhase}`);
+console.log(`Year: ${s.year}, Year-scoped log entries: ${s.log.filter((l) => l.year === s.year).length}`);
