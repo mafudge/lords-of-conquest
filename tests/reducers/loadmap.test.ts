@@ -20,7 +20,7 @@ const initial = (): GameState => ({
   rejectedTrades: [], autoReject: [], log: [],
 });
 
-describe('loadmap', () => {
+describe('loadMap', () => {
   it('replaces the board with a decoded one and resets ownership to null', () => {
     // Generate a board and encode it
     const board = generateMap(123, setup.map, 2);
@@ -31,7 +31,7 @@ describe('loadmap', () => {
     s = reduce(s, { kind: 'selection', player: s.currentPlayer, territoryId: 0 });
     s = reduce(s, { kind: 'selection', player: s.currentPlayer, territoryId: 1 });
     // Now load the other map
-    const out = reduce(s, { kind: 'loadmap', mapText: text });
+    const out = reduce(s, { kind: 'loadMap', mapText: text });
     expect(out.territories.every((t) => t.ownerId === null)).toBe(true);
     expect(out.currentPhase).toBe('selection');
     expect(out.touching).toBeDefined();
@@ -40,7 +40,7 @@ describe('loadmap', () => {
 
   it('rejects invalid map text', () => {
     let s = reduce(initial(), { kind: 'newGame', setup, seed: 7 });
-    expect(() => reduce(s, { kind: 'loadmap', mapText: 'not a map' }))
+    expect(() => reduce(s, { kind: 'loadMap', mapText: 'not a map' }))
       .toThrow(/decode|invalid/i);
   });
 });

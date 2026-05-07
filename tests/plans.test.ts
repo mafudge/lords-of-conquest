@@ -8,7 +8,7 @@ describe('plans', () => {
       'tradeRejectAll', 'horseFrom', 'horseTo', 'shipStockpile',
       'shipHorse', 'shipWeapon', 'shipBoat', 'attack', 'alliesDecision',
       'resolveCombat', 'buildCity', 'buildWeapon', 'buildBoat',
-      'endPhase', 'savegame', 'loadgame', 'loadmap',
+      'endPhase', 'savegame', 'loadGame', 'loadMap',
     ];
     expect(new Set(kinds).size).toBe(kinds.length);
     expect(kinds).toHaveLength(22);

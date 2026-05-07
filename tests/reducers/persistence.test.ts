@@ -18,7 +18,7 @@ const initial = (): GameState => ({
   rejectedTrades: [], autoReject: [], log: [],
 });
 
-describe('savegame & loadgame', () => {
+describe('savegame & loadGame', () => {
   it('savegame appends a log entry without mutating other state', () => {
     let s = reduce(initial(), { kind: 'newGame', setup, seed: 7 });
     const yearBefore = s.year;
@@ -29,17 +29,17 @@ describe('savegame & loadgame', () => {
     expect(last.message).toMatch(/autosave/);
   });
 
-  it('loadgame replaces the entire state with the provided state', () => {
+  it('loadGame replaces the entire state with the provided state', () => {
     const a = reduce(initial(), { kind: 'newGame', setup, seed: 1 });
     const b = reduce(initial(), { kind: 'newGame', setup, seed: 2 });
-    const out = reduce(a, { kind: 'loadgame', state: b });
+    const out = reduce(a, { kind: 'loadGame', state: b });
     expect(out.seed).toBe(2);
     expect(out.squares).toEqual(b.squares);
   });
 
-  it('loadgame validates schema version', () => {
+  it('loadGame validates schema version', () => {
     const a = reduce(initial(), { kind: 'newGame', setup, seed: 1 });
     const fake = { ...a, schemaVersion: 999 as 1 };
-    expect(() => reduce(a, { kind: 'loadgame', state: fake })).toThrow(/schema/i);
+    expect(() => reduce(a, { kind: 'loadGame', state: fake })).toThrow(/schema/i);
   });
 });

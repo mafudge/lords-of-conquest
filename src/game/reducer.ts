@@ -24,9 +24,9 @@ export function reduce(state: GameState, plan: Plan): GameState {
       return applyProduction(state);
     case 'savegame':
       return applySavegame(state, plan.slot);
-    case 'loadgame':
+    case 'loadGame':
       return applyLoadgame(state, plan.state);
-    case 'loadmap':
+    case 'loadMap':
       return applyLoadmap(state, plan.mapText);
     case 'endPhase':
       return applyEndPhase(state, plan.player);

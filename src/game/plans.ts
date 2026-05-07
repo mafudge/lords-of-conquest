@@ -27,7 +27,7 @@ export type Plan =
   | { kind: 'buildBoat'; player: PlayerId; territoryId: number; lakeId: number; payInGold: boolean }
   | { kind: 'endPhase'; player: PlayerId }
   | { kind: 'savegame'; slot: 'autosave' | 'slot1' | 'slot2' | 'slot3' }
-  | { kind: 'loadgame'; state: GameState }
-  | { kind: 'loadmap'; mapText: string };
+  | { kind: 'loadGame'; state: GameState }
+  | { kind: 'loadMap'; mapText: string };
 
 export type PlanKind = Plan['kind'];

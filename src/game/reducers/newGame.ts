@@ -12,13 +12,15 @@ export function applyNewGame(
   if (n < 2) throw new Error('NEW_GAME requires at least 2 players');
   if (n > 7) throw new Error('NEW_GAME accepts at most 7 players');
 
+  // RNG contract: mapgen owns its own RNG instance keyed off `seed`, so map
+  // output is fully determined by `(seed, params)`. The persistent in-state
+  // `rngCursor` is a SECOND, independent stream — also keyed off `seed` but
+  // advanced only by post-setup gameplay (production skip-rolls, AI, combat).
+  // The two streams produce identical raw floats at the same cursor, but the
+  // game never interleaves draws between them, so collision is harmless.
+  // INVARIANT: do not consume the in-state RNG inside or before mapgen.
   const rng = createRng(seed);
-  // Map generation consumes RNG draws first; subsequent randomness (player
-  // shuffle) draws from the same stream so the full game is reproducible.
   const board = generateMap(seed, setup.map, n);
-  // generateMap runs its own RNG instance; advance our cursor past those draws
-  // by constructing a fresh rng for any further consumption. (Each call to
-  // generateMap is deterministic per seed.)
 
   const players: Player[] = setup.players.map((p, i) => ({
     id: i as PlayerId,
