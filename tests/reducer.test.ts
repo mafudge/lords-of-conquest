@@ -26,10 +26,10 @@ const minimalState = (): GameState => ({
 });
 
 describe('reducer', () => {
-  it('throws "not implemented" for plan kinds not yet handled', () => {
+  it('throws a phase error for buildCity outside development', () => {
     const state = minimalState();
     const plan: Plan = { kind: 'buildCity', player: 0, territoryId: 0, payInGold: false };
-    expect(() => reduce(state, plan)).toThrow(/not implemented/i);
+    expect(() => reduce(state, plan)).toThrow(/buildCity illegal/i);
   });
 
   it('throws "unknown plan kind" for invalid kinds', () => {
