@@ -1,0 +1,39 @@
+// LocAI.java L9-12
+export const PERSONA_HUMAN = 0;
+export const PERSONA_PASSIVE = 1;
+export const PERSONA_DEFENSIVE = 2;
+export const PERSONA_AGGRESSIVE = 3;
+
+// LocAI.java L15-50 — verbatim numeric constants
+export const ptCity = 8;
+export const ptStockpile = 15;
+export const ptRatingsBoundary = 50;
+export const ptCanBuildCity = 8;
+export const ptCanBuildWeapon = 3;
+export const ptCanBuildBoat = 2;
+export const ptTerrWRes = 2;
+export const ptOppWinCity = -10000;
+export const ptFCAdvOwnTerr = 1;
+export const ptFCAdvOppTerr = 1;
+export const ptFCDisOwnTerr = -5;
+export const ptFCDisOppTerr = -3;
+export const ptVulnerableHorse = -2;
+export const ptVulnerableWeapon = -6;
+export const ptVulnerableBoat = -4;
+export const ptVulnerableCity = -8;
+export const ptFCDisStockpile = -5;
+export const ptFCAdvStockpile = 1;
+export const ptGroupHorseWeapon = 1;
+export const ptGroupBoatHW = 1;
+export const ptOwnForceCount = 1;
+export const ptOppForceCount = -1;
+export const ptOppBoatPotential = -6;
+export const ptResource: readonly number[] = [7, 7, 7, 9, 7];
+export const ptOneOfEach = 2;
+export const ptIronAndCoal = 2;
+export const ptFirstOfType = 3;
+export const ptTouchTerr = 1;
+export const ptTouchTerrWResource = 2;
+export const ptTerrVulnerable = -5;
+export const ptTouchOwnTerr = 1;
+export const ptTouchOwnTerrWResource = 2;
