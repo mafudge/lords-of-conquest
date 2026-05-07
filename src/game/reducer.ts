@@ -6,9 +6,9 @@ import { applyEndPhase } from './reducers/endPhase.js';
 import { applyProduction } from './reducers/production.js';
 import { applySavegame, applyLoadgame } from './reducers/persistence.js';
 import { applyLoadmap } from './reducers/loadmap.js';
+import { applyTradePropose, applyTradeResponse, applyHorseFrom, applyHorseTo, applyTradeRejectAll } from './reducers/trade.js';
 
 const NOT_IMPLEMENTED_KINDS: ReadonlyArray<Plan['kind']> = [
-  'trade', 'tradeResponse', 'tradeRejectAll', 'horseFrom', 'horseTo',
   'shipStockpile', 'shipHorse', 'shipWeapon', 'shipBoat',
   'attack', 'alliesDecision', 'resolveCombat',
   'buildCity', 'buildWeapon', 'buildBoat',
@@ -30,6 +30,16 @@ export function reduce(state: GameState, plan: Plan): GameState {
       return applyLoadmap(state, plan.mapText);
     case 'endPhase':
       return applyEndPhase(state, plan.player);
+    case 'trade':
+      return applyTradePropose(state, plan.proposer, plan.tradee, plan.give, plan.receive);
+    case 'tradeResponse':
+      return applyTradeResponse(state, plan.accept);
+    case 'horseFrom':
+      return applyHorseFrom(state, plan.player, plan.territoryId);
+    case 'horseTo':
+      return applyHorseTo(state, plan.player, plan.territoryId);
+    case 'tradeRejectAll':
+      return applyTradeRejectAll(state, plan.tradee, plan.trader);
     default: {
       // Distinguish between "Plan 3 territory" and "completely unknown"
       const kind = (plan as { kind?: string }).kind;
