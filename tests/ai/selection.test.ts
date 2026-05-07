@@ -1,5 +1,7 @@
 import { describe, it, expect } from 'vitest';
-import { scoreSelectionCandidate } from '../../src/game/ai/selection.js';
+import { scoreSelectionCandidate, decideSelectionAction } from '../../src/game/ai/selection.js';
+import { decideAction } from '../../src/game/ai/decideAction.js';
+import type { Plan } from '../../src/game/plans.js';
 import { seededState } from './_fixtures.js';
 
 describe('scoreSelectionCandidate', () => {
@@ -44,5 +46,26 @@ describe('scoreSelectionCandidate', () => {
     const isolated = scoreSelectionCandidate(wiped, 0, B);
     const adjacent = scoreSelectionCandidate(ownedA, 0, B);
     expect(adjacent).toBeGreaterThan(isolated);
+  });
+});
+
+describe('decideSelectionAction', () => {
+  it('returns a selection Plan for the highest-scoring unowned territory', () => {
+    let s = seededState({ seed: 42, playerCount: 2 });
+    s = { ...s, currentPhase: 'selection', currentPlayer: 0,
+      territories: s.territories.map((t) => ({ ...t, ownerId: null })) };
+    const plan = decideSelectionAction(s, 0) as Extract<Plan, { kind: 'selection' }>;
+    expect(plan.kind).toBe('selection');
+    expect(plan.player).toBe(0);
+    const t = s.territories.find((tt) => tt.id === plan.territoryId)!;
+    expect(t.ownerId).toBeNull();
+  });
+
+  it('decideAction routes selection phase through scoring', () => {
+    let s = seededState({ seed: 42, playerCount: 2 });
+    s = { ...s, currentPhase: 'selection', currentPlayer: 0,
+      territories: s.territories.map((t) => ({ ...t, ownerId: null })) };
+    const plan = decideAction(s, 0);
+    expect(plan.kind).toBe('selection');
   });
 });

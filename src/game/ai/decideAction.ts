@@ -1,10 +1,11 @@
 import type { GameState, PlayerId } from '../types.js';
 import type { Plan } from '../plans.js';
+import { decideSelectionAction } from './selection.js';
 
 export function decideAction(state: GameState, player: PlayerId): Plan {
   switch (state.currentPhase) {
     case 'selection':
-      throw new Error(`selection AI not implemented yet`);
+      return decideSelectionAction(state, player);
     case 'production':
       // Production has no AI choice — runAITurn emits the production plan
       // directly; if decideAction is reached for production the caller is wrong.

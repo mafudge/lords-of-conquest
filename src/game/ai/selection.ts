@@ -3,6 +3,7 @@
 // public decideSelectionAction that iterates all unowned territories.
 
 import type { GameState, PlayerId } from '../types.js';
+import type { Plan } from '../plans.js';
 import { getForceCount } from '../force.js';
 import {
   PERSONA_PASSIVE,
@@ -162,4 +163,32 @@ export function scoreSelectionCandidate(
   }
 
   return score;
+}
+
+/**
+ * Decide which unowned territory to select in the selection phase.
+ *
+ * Iterates through all unowned territories, scores each via scoreSelectionCandidate,
+ * and returns a Plan for the highest-scoring one.
+ *
+ * @param state   - current game state (expected in 'selection' phase)
+ * @param player  - the AI player making the selection
+ * @returns Plan with kind: 'selection', player, and territoryId
+ * @throws if no unowned territory remains
+ */
+export function decideSelectionAction(state: GameState, player: PlayerId): Plan {
+  let bestId = -1;
+  let bestScore = -Infinity;
+  for (const t of state.territories) {
+    if (t.ownerId !== null) continue;
+    const score = scoreSelectionCandidate(state, player, t.id);
+    if (score > bestScore) {
+      bestScore = score;
+      bestId = t.id;
+    }
+  }
+  if (bestId < 0) {
+    throw new Error('decideSelectionAction: no unowned territory remains');
+  }
+  return { kind: 'selection', player, territoryId: bestId };
 }

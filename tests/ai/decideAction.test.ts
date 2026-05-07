@@ -32,9 +32,7 @@ describe('decideAction skeleton', () => {
       .toThrow(/setup|caller error/i);
   });
 
-  it('throws "not implemented yet" for each phase whose AI is not yet wired', () => {
-    expect(() => decideAction(bareState('selection'), 0))
-      .toThrow(/not implemented yet/i);
+  it('throws "not implemented yet" for phases not yet wired', () => {
     expect(() => decideAction(bareState('trade'), 0))
       .toThrow(/not implemented yet/i);
     expect(() => decideAction(bareState('shipment'), 0))
