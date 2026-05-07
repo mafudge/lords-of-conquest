@@ -46,6 +46,34 @@ function combatReady(att: number, def: number): { state: GameState; from: number
   return { state: { ...s, pendingCombat: c }, from, target };
 }
 
+// ---------------------------------------------------------------------------
+// Task 10: Boat re-flag tests (appended after Task 9 describe block)
+// ---------------------------------------------------------------------------
+
+describe('post-attack: boat re-flag', () => {
+  it('all boats docked at target switch to attacker', () => {
+    const { state: s, target } = combatReady(5, 3);
+    s.boats[0] = {
+      id: 0, x: -1, y: -1, homeTerritoryId: target, ownerId: 1,
+      carryHorse: false, carryWeapon: false,
+    };
+    const out = reduce(s, { kind: 'resolveCombat' });
+    expect(out.boats[0]!.ownerId).toBe(0);
+    expect(out.boats[0]!.homeTerritoryId).toBe(target);
+  });
+
+  it('boats elsewhere are not affected', () => {
+    const { state: s, target } = combatReady(5, 3);
+    const otherTerr = s.territories.find((t) => t.id !== target && t.ownerId === 1)!.id;
+    s.boats[0] = {
+      id: 0, x: -1, y: -1, homeTerritoryId: otherTerr, ownerId: 1,
+      carryHorse: false, carryWeapon: false,
+    };
+    const out = reduce(s, { kind: 'resolveCombat' });
+    expect(out.boats[0]!.ownerId).toBe(1);
+  });
+});
+
 describe('post-attack: territory transfer', () => {
   it('attacker takes target on win', () => {
     const { state: s, target } = combatReady(5, 3);
