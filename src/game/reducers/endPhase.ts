@@ -147,6 +147,52 @@ export function applyEndPhase(prev: GameState, _player: PlayerId): GameState {
         ],
       };
     }
+    case 'conquest': {
+      if (prev.pendingCombat && !prev.pendingCombat.resolved) {
+        throw new Error(`Cannot end conquest with pending combat in flight`);
+      }
+      const player = prev.currentPlayer;
+      const forfeit = prev.shipmentForfeitsSecondAttack[player] === true;
+      if (prev.attackNumber === 1 && !forfeit) {
+        return {
+          ...prev,
+          attackNumber: 2,
+          pendingCombat: null,
+          log: [
+            ...prev.log,
+            { year: prev.year, phase: 'conquest', player,
+              message: `Player ${player} begins attack #2` },
+          ],
+        };
+      }
+      const idx = prev.turnOrder.indexOf(player);
+      const nextIdx = (idx + 1) % prev.turnOrder.length;
+      if (nextIdx !== 0) {
+        return {
+          ...prev,
+          currentPlayer: prev.turnOrder[nextIdx]!,
+          attackNumber: 1,
+          pendingCombat: null,
+          log: [
+            ...prev.log,
+            { year: prev.year, phase: 'conquest', player: prev.turnOrder[nextIdx]!,
+              message: `Player ${prev.turnOrder[nextIdx]} begins conquest` },
+          ],
+        };
+      }
+      return {
+        ...prev,
+        currentPhase: 'development',
+        currentPlayer: prev.turnOrder[0]!,
+        attackNumber: 1,
+        pendingCombat: null,
+        log: [
+          ...prev.log,
+          { year: prev.year, phase: 'development', player: prev.turnOrder[0]!,
+            message: 'Development phase begins' },
+        ],
+      };
+    }
     default:
       throw new Error(`endPhase from ${prev.currentPhase} is not implemented in plan 2 (Plan 3 territory)`);
   }
