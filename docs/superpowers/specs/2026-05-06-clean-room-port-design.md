@@ -1,13 +1,15 @@
-# Lords of Conquest — Web Remake Design
+# Lords of Conquest — Clean-Room Port Design
 
-**Status:** Approved for planning
+**Status:** Deferred. The current MVP is a CheerpJ embed of Randy Gettman's original Java applet (`/index.html` + `/loc.jar`). This spec describes a future clean-room TypeScript port that may follow once the embed is shipped.
 **Date:** 2026-05-06
 
 ## Overview
 
-A browser-based remake of the 1986 Electronic Arts strategy game *Lords of Conquest*. Single-player against 1–3 AI opponents. Runs entirely client-side from a static site. Built as a portfolio piece — code clarity, polish, and demonstrable AI matter.
+A browser-based clean-room remake of the 1986 Electronic Arts strategy game *Lords of Conquest*. Single-player against 1–3 AI opponents. Runs entirely client-side from a static site. Built as a portfolio piece — code clarity, polish, and demonstrable AI matter.
 
 The game is faithful to the original ruleset (5 resources, 5-phase turn, strength-by-adjacency combat, city-based victory) with modern, voluntary trading and deterministic seeded RNG for reproducible games.
+
+This is **not** a port of Gettman's applet bytecode; that is a separate (Option 1) project that would decompile `loc.jar` and translate the existing Java logic class-by-class.
 
 ## Goals
 
