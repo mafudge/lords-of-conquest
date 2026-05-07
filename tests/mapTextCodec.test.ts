@@ -2,6 +2,7 @@ import { describe, it, expect } from 'vitest';
 import { encodeMap } from '../src/game/mapTextCodec.js';
 import { decodeMap } from '../src/game/mapTextCodec.js';
 import { initBoard } from '../src/game/mapgen/board.js';
+import { generateMap } from '../src/game/mapgen/index.js';
 
 describe('encodeMap', () => {
   it('all-water board encodes as 20 lines of 40 dots followed by footer', () => {
@@ -93,6 +94,28 @@ describe('decodeMap (happy path)', () => {
       expect(decoded.numTerritories).toBe(2);
       for (let i = 0; i < 7; i++) expect(decoded.squares[i]!.territoryId).toBe(0);
       for (let i = 40; i < 47; i++) expect(decoded.squares[i]!.territoryId).toBe(1);
+    }
+  });
+});
+
+describe('mapTextCodec roundtrip', () => {
+  it.each([1, 2, 3, 4, 5])('encode→decode is identity for seed %i', (seed) => {
+    const board = generateMap(seed, {
+      waterBoundary: true,
+      waterArea: 'small',
+      numTerritories: 24,
+      islands: 'some',
+      shapes: 'regular',
+      resourceDensity: { kind: 'fixed', level: 'medium' },
+    }, 4);
+    const text = encodeMap(board.squares);
+    const decoded = decodeMap(text);
+    expect(decoded.kind).toBe('ok');
+    if (decoded.kind === 'ok') {
+      for (let i = 0; i < 800; i++) {
+        expect(decoded.squares[i]!.territoryId).toBe(board.squares[i]!.territoryId);
+      }
+      expect(decoded.numTerritories).toBe(24);
     }
   });
 });
