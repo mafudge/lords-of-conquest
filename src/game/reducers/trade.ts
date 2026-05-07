@@ -99,17 +99,26 @@ function involvesHorses(offer: { give: Stockpile; receive: Stockpile }): boolean
   return offer.give[4] > 0 || offer.receive[4] > 0;
 }
 
+function swapStockpiles(
+  players: Array<{ stockpile: Stockpile }>,
+  proposerId: number,
+  tradeeId: number,
+  give: Stockpile,
+  receive: Stockpile,
+): void {
+  const INDICES = [0, 1, 2, 3, 4] as const;
+  for (const i of INDICES) {
+    players[proposerId]!.stockpile[i] = players[proposerId]!.stockpile[i] - give[i] + receive[i];
+    players[tradeeId]!.stockpile[i] = players[tradeeId]!.stockpile[i] - receive[i] + give[i];
+  }
+}
+
 function acceptTradeNoHorses(
   prev: GameState,
   offer: NonNullable<GameState['pendingTrade']>,
 ): GameState {
   const players = prev.players.map((p) => ({ ...p, stockpile: [...p.stockpile] as Stockpile }));
-  for (let i = 0; i < 5; i++) {
-    players[offer.proposerId]!.stockpile[i] -= offer.give[i]!;
-    players[offer.proposerId]!.stockpile[i] += offer.receive[i]!;
-    players[offer.tradeeId]!.stockpile[i] -= offer.receive[i]!;
-    players[offer.tradeeId]!.stockpile[i] += offer.give[i]!;
-  }
+  swapStockpiles(players, offer.proposerId, offer.tradeeId, offer.give, offer.receive);
   return {
     ...prev,
     players,
@@ -218,12 +227,7 @@ export function applyHorseTo(
     tt.id === territoryId ? { ...tt, hasHorse: true } : tt,
   );
   const players = prev.players.map((p) => ({ ...p, stockpile: [...p.stockpile] as Stockpile }));
-  for (let i = 0; i < 5; i++) {
-    players[offer.proposerId]!.stockpile[i] -= offer.give[i]!;
-    players[offer.proposerId]!.stockpile[i] += offer.receive[i]!;
-    players[offer.tradeeId]!.stockpile[i] -= offer.receive[i]!;
-    players[offer.tradeeId]!.stockpile[i] += offer.give[i]!;
-  }
+  swapStockpiles(players, offer.proposerId, offer.tradeeId, offer.give, offer.receive);
   return {
     ...prev,
     territories,
