@@ -4,6 +4,7 @@ import { decideSelectionAction } from './selection.js';
 import { decideDevelopmentAction } from './development.js';
 import { decideShipmentAction } from './shipment.js';
 import { getProposedTradePlan } from './trade.js';
+import { decideConquestAction } from './conquest.js';
 
 export function decideAction(state: GameState, player: PlayerId): Plan {
   switch (state.currentPhase) {
@@ -18,7 +19,7 @@ export function decideAction(state: GameState, player: PlayerId): Plan {
     case 'shipment':
       return decideShipmentAction(state, player);
     case 'conquest':
-      throw new Error(`conquest AI not implemented yet`);
+      return decideConquestAction(state, player);
     case 'development':
       return decideDevelopmentAction(state, player);
     case 'gameOver':

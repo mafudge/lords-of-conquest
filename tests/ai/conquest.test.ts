@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { decideAlliesAction } from '../../src/game/ai/conquest.js';
+import { decideAlliesAction, decideConquestAction } from '../../src/game/ai/conquest.js';
 import { seededState } from './_fixtures.js';
 import type { CombatState } from '../../src/game/types.js';
 
@@ -51,5 +51,28 @@ describe('decideAlliesAction', () => {
       resolved: false, attackerWon: false,
     };
     expect(decideAlliesAction(s, 2, c)).toBe('neutral');
+  });
+});
+
+describe('decideConquestAction', () => {
+  it('returns endPhase for passive personas', () => {
+    let s = seededState({ seed: 42, personas: ['passive', 'aggressive', 'aggressive'] });
+    s = { ...s, currentPhase: 'conquest', currentPlayer: 0, attackNumber: 1 };
+    const plan = decideConquestAction(s, 0);
+    expect(plan.kind).toBe('endPhase');
+  });
+
+  it('returns an attack or endPhase plan for active player', () => {
+    let s = seededState({ seed: 42 });
+    s = { ...s, currentPhase: 'conquest', currentPlayer: 0, attackNumber: 1 };
+    const plan = decideConquestAction(s, 0);
+    expect(['attack', 'endPhase']).toContain(plan.kind);
+  });
+
+  it('aggressive AI may pick a positive-utility attack', () => {
+    let s = seededState({ seed: 42, personas: ['aggressive', 'defensive', 'aggressive'] });
+    s = { ...s, currentPhase: 'conquest', currentPlayer: 0, attackNumber: 1 };
+    const plan = decideConquestAction(s, 0);
+    expect(['attack', 'endPhase']).toContain(plan.kind);
   });
 });

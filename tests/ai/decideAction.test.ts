@@ -32,8 +32,8 @@ describe('decideAction skeleton', () => {
       .toThrow(/setup|caller error/i);
   });
 
-  it('throws "not implemented yet" for phases not yet wired', () => {
-    expect(() => decideAction(bareState('conquest'), 0))
-      .toThrow(/not implemented yet/i);
+  it('returns a plan for conquest phase', () => {
+    const plan = decideAction(bareState('conquest'), 0);
+    expect(['attack', 'endPhase']).toContain(plan.kind);
   });
 });
