@@ -113,5 +113,33 @@ if (s.currentPhase === 'shipment') {
   }
 }
 
-console.log(`\nFinal phase reached: ${s.currentPhase}`);
-console.log(`Year: ${s.year}, Year-scoped log entries: ${s.log.filter((l) => l.year === s.year).length}`);
+// --- Drive multi-year simulation ---
+const TARGET_YEAR = 3;
+console.log(`\n--- Driving simulation to year ${TARGET_YEAR + 1} ---`);
+
+while (s.year <= TARGET_YEAR && s.currentPhase !== 'gameOver') {
+  const yearAtStart = s.year;
+  const phaseAtStart = s.currentPhase;
+  switch (s.currentPhase) {
+    case 'production': {
+      s = reduce(s, { kind: 'production' });
+      s = reduce(s, { kind: 'endPhase', player: s.currentPlayer });
+      break;
+    }
+    case 'trade':
+    case 'shipment':
+    case 'conquest':
+    case 'development': {
+      s = reduce(s, { kind: 'endPhase', player: s.currentPlayer });
+      break;
+    }
+    default:
+      s = reduce(s, { kind: 'endPhase', player: s.currentPlayer });
+  }
+  if (s.year !== yearAtStart) {
+    console.log(`  year ${yearAtStart} → ${s.year}; phase ${phaseAtStart} → ${s.currentPhase}`);
+  }
+}
+
+console.log(`\nFinal phase reached: ${s.currentPhase} (year ${s.year})`);
+console.log(`Total log entries: ${s.log.length}`);

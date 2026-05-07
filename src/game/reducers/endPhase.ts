@@ -2,6 +2,8 @@ import type { GameState, PlayerId } from '../types.js';
 import { PHASE_SKIP_PROBABILITY } from '../constants.js';
 import { nextFloat } from '../rng.js';
 import { pickReason } from '../reasons.js';
+import { checkEndOfGame } from '../checkEndOfGame.js';
+import { applyYearWrap } from './yearWrap.js';
 
 export function applyEndPhase(prev: GameState, _player: PlayerId): GameState {
   switch (prev.currentPhase) {
@@ -146,6 +148,82 @@ export function applyEndPhase(prev: GameState, _player: PlayerId): GameState {
             message: 'Conquest phase begins' },
         ],
       };
+    }
+    case 'conquest': {
+      if (prev.pendingCombat && !prev.pendingCombat.resolved) {
+        throw new Error(`Cannot end conquest with pending combat in flight`);
+      }
+      const player = prev.currentPlayer;
+      const forfeit = prev.shipmentForfeitsSecondAttack[player] === true;
+      if (prev.attackNumber === 1 && !forfeit) {
+        return {
+          ...prev,
+          attackNumber: 2,
+          pendingCombat: null,
+          log: [
+            ...prev.log,
+            { year: prev.year, phase: 'conquest', player,
+              message: `Player ${player} begins attack #2` },
+          ],
+        };
+      }
+      const idx = prev.turnOrder.indexOf(player);
+      const nextIdx = (idx + 1) % prev.turnOrder.length;
+      if (nextIdx !== 0) {
+        return {
+          ...prev,
+          currentPlayer: prev.turnOrder[nextIdx]!,
+          attackNumber: 1,
+          pendingCombat: null,
+          log: [
+            ...prev.log,
+            { year: prev.year, phase: 'conquest', player: prev.turnOrder[nextIdx]!,
+              message: `Player ${prev.turnOrder[nextIdx]} begins conquest` },
+          ],
+        };
+      }
+      return {
+        ...prev,
+        currentPhase: 'development',
+        currentPlayer: prev.turnOrder[0]!,
+        attackNumber: 1,
+        pendingCombat: null,
+        log: [
+          ...prev.log,
+          { year: prev.year, phase: 'development', player: prev.turnOrder[0]!,
+            message: 'Development phase begins' },
+        ],
+      };
+    }
+    case 'development': {
+      const idx = prev.turnOrder.indexOf(prev.currentPlayer);
+      const nextIdx = (idx + 1) % prev.turnOrder.length;
+      if (nextIdx !== 0) {
+        return {
+          ...prev,
+          currentPlayer: prev.turnOrder[nextIdx]!,
+          attackNumber: 1,
+          shipmentUsed: false,
+          log: [
+            ...prev.log,
+            { year: prev.year, phase: 'development', player: prev.turnOrder[nextIdx]!,
+              message: `Player ${prev.turnOrder[nextIdx]} begins development` },
+          ],
+        };
+      }
+      const winner = checkEndOfGame(prev);
+      if (winner !== null) {
+        return {
+          ...prev,
+          currentPhase: 'gameOver',
+          log: [
+            ...prev.log,
+            { year: prev.year, phase: 'gameOver', player: winner,
+              message: `Player ${winner} won the game (year ${prev.year})` },
+          ],
+        };
+      }
+      return applyYearWrap(prev);
     }
     default:
       throw new Error(`endPhase from ${prev.currentPhase} is not implemented in plan 2 (Plan 3 territory)`);
