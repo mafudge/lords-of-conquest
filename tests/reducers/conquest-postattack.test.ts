@@ -98,3 +98,46 @@ describe('post-attack: territory transfer', () => {
     expect(out.territories[target]!.ownerId).toBe(0);
   });
 });
+
+describe('post-attack: horse and weapon transfer', () => {
+  it('defender loses 1 from stockpile[4] when target had a horse', () => {
+    const { state: s, target } = combatReady(5, 3);
+    s.territories[target]!.hasHorse = true;
+    s.players[1]!.stockpile[4] = 2;
+    const out = reduce(s, { kind: 'resolveCombat' });
+    expect(out.players[1]!.stockpile[4]).toBe(1);
+  });
+
+  it('attacker gains +1 in stockpile[4] when not bringing horse and target had one', () => {
+    const { state: s, target } = combatReady(5, 3);
+    s.territories[target]!.hasHorse = true;
+    const before = s.players[0]!.stockpile[4];
+    const out = reduce(s, { kind: 'resolveCombat' });
+    expect(out.players[0]!.stockpile[4]).toBe(before + 1);
+  });
+
+  it('attacker does NOT gain stockpile[4] when bringing own horse', () => {
+    const { state: s, from, target } = combatReady(5, 3);
+    s.pendingCombat!.horseFromTerritoryId = from;
+    s.territories[target]!.hasHorse = true;
+    const before = s.players[0]!.stockpile[4];
+    const out = reduce(s, { kind: 'resolveCombat' });
+    expect(out.players[0]!.stockpile[4]).toBe(before);
+  });
+
+  it('brought horse lands on captured tile if target had none', () => {
+    const { state: s, from, target } = combatReady(5, 3);
+    s.territories[target]!.hasHorse = false;
+    s.pendingCombat!.horseFromTerritoryId = from;
+    const out = reduce(s, { kind: 'resolveCombat' });
+    expect(out.territories[target]!.hasHorse).toBe(true);
+  });
+
+  it('brought weapon lands on captured tile if target had none', () => {
+    const { state: s, from, target } = combatReady(5, 3);
+    s.territories[target]!.hasWeapon = false;
+    s.pendingCombat!.weaponFromTerritoryId = from;
+    const out = reduce(s, { kind: 'resolveCombat' });
+    expect(out.territories[target]!.hasWeapon).toBe(true);
+  });
+});
