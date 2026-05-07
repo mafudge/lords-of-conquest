@@ -1,6 +1,6 @@
 import type { GameState, PlayerId } from '../types.js';
 import type { Plan } from '../plans.js';
-import { isPassive } from './personas.js';
+import { isPassive, isAggressive } from './personas.js';
 import { getBFPossible } from './bfPossible.js';
 import { getDevelopmentUtility, type DevelopmentBundle } from './scoring/developmentUtility.js';
 
@@ -20,6 +20,40 @@ export function decideDevelopmentAction(state: GameState, player: PlayerId): Pla
       if (u > bestUtility) {
         bestUtility = u;
         bestPlan = candidate.plan;
+      }
+    }
+  }
+
+  // Aggressive fallback: if nothing scored positive, try boat-anywhere or
+  // weapon-anywhere (LocAI L514–L604).
+  if (bestPlan === null && isAggressive(state, player)) {
+    const stock = state.players[player]!.stockpile;
+    // Try boat first (any coastal owned territory)
+    for (const t of state.territories) {
+      if (t.ownerId !== player || t.bordersLakes.size === 0) continue;
+      if (stock[2] >= 3) {
+        const lakeId = [...t.bordersLakes][0]!;
+        bestPlan = { kind: 'buildBoat', player, territoryId: t.id, lakeId, payInGold: false };
+        break;
+      }
+      if (stock[3] >= 3) {
+        const lakeId = [...t.bordersLakes][0]!;
+        bestPlan = { kind: 'buildBoat', player, territoryId: t.id, lakeId, payInGold: true };
+        break;
+      }
+    }
+    // Then weapon (any owned territory without a weapon)
+    if (bestPlan === null) {
+      for (const t of state.territories) {
+        if (t.ownerId !== player || t.hasWeapon) continue;
+        if (stock[0] >= 1 && stock[1] >= 1) {
+          bestPlan = { kind: 'buildWeapon', player, territoryId: t.id, payInGold: false };
+          break;
+        }
+        if (stock[3] >= 2) {
+          bestPlan = { kind: 'buildWeapon', player, territoryId: t.id, payInGold: true };
+          break;
+        }
       }
     }
   }
