@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { getCombatStrength, isAutoPreventSuicide } from '../src/game/combat.js';
-import type { GameState, CombatState, Territory } from '../src/game/types.js';
+import type { GameState, CombatState, Territory, PlayerId } from '../src/game/types.js';
 
 function stateWithForce(perPlayerForces: Record<number, number>): GameState {
   const territories: Territory[] = [
@@ -60,7 +60,7 @@ const baseCombat = (overrides: Partial<CombatState>): CombatState => ({
   attackerId: 0, defenderId: 1,
   fromTerritoryId: 0, targetTerritoryId: 0,
   boatId: null, horseFromTerritoryId: null, weaponFromTerritoryId: null,
-  alliesDecisions: [], alliesPending: new Set<number>(),
+  alliesDecisions: [], alliesPending: new Set<PlayerId>(),
   attackerStrength: 0, defenderStrength: 0, resolved: false, attackerWon: false,
   ...overrides,
 });
