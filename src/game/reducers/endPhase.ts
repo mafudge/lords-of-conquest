@@ -193,6 +193,36 @@ export function applyEndPhase(prev: GameState, _player: PlayerId): GameState {
         ],
       };
     }
+    case 'development': {
+      const idx = prev.turnOrder.indexOf(prev.currentPlayer);
+      const nextIdx = (idx + 1) % prev.turnOrder.length;
+      if (nextIdx !== 0) {
+        return {
+          ...prev,
+          currentPlayer: prev.turnOrder[nextIdx]!,
+          attackNumber: 1,
+          shipmentUsed: false,
+          log: [
+            ...prev.log,
+            { year: prev.year, phase: 'development', player: prev.turnOrder[nextIdx]!,
+              message: `Player ${prev.turnOrder[nextIdx]} begins development` },
+          ],
+        };
+      }
+      return {
+        ...prev,
+        currentPhase: 'production',
+        currentPlayer: prev.turnOrder[0]!,
+        year: prev.year + 1,
+        attackNumber: 1,
+        shipmentUsed: false,
+        log: [
+          ...prev.log,
+          { year: prev.year + 1, phase: 'production', player: prev.turnOrder[0]!,
+            message: 'Year wrap; new year begins' },
+        ],
+      };
+    }
     default:
       throw new Error(`endPhase from ${prev.currentPhase} is not implemented in plan 2 (Plan 3 territory)`);
   }
