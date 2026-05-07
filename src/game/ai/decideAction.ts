@@ -1,6 +1,7 @@
 import type { GameState, PlayerId } from '../types.js';
 import type { Plan } from '../plans.js';
 import { decideSelectionAction } from './selection.js';
+import { decideDevelopmentAction } from './development.js';
 
 export function decideAction(state: GameState, player: PlayerId): Plan {
   switch (state.currentPhase) {
@@ -17,7 +18,7 @@ export function decideAction(state: GameState, player: PlayerId): Plan {
     case 'conquest':
       throw new Error(`conquest AI not implemented yet`);
     case 'development':
-      throw new Error(`development AI not implemented yet`);
+      return decideDevelopmentAction(state, player);
     case 'gameOver':
     case 'setup':
       throw new Error(`decideAction caller error: phase '${state.currentPhase}'`);

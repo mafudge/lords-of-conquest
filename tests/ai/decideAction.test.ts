@@ -39,7 +39,5 @@ describe('decideAction skeleton', () => {
       .toThrow(/not implemented yet/i);
     expect(() => decideAction(bareState('conquest'), 0))
       .toThrow(/not implemented yet/i);
-    expect(() => decideAction(bareState('development'), 0))
-      .toThrow(/not implemented yet/i);
   });
 });
