@@ -38,3 +38,22 @@ describe('growOnce (regular)', () => {
     }
   });
 });
+
+describe('growOnce (irregular)', () => {
+  it('jumps 2 squares in same direction when possible (so square count grows by 2)', () => {
+    const sq = initBoard(false);
+    sq[100]!.territoryId = 0;  // seed at (20, 2)
+    const r = createRng(0xBEEF);
+    let beforeCount = 1;
+    let afterCount = 1;
+    // Run several growth steps; in irregular mode some should add 2 squares.
+    let sawJump = false;
+    for (let i = 0; i < 30; i++) {
+      const before = sq.filter((s) => s.territoryId === 0).length;
+      growOnce(sq, r, 0, 'irregular');
+      const after = sq.filter((s) => s.territoryId === 0).length;
+      if (after - before === 2) sawJump = true;
+    }
+    expect(sawJump).toBe(true);
+  });
+});
