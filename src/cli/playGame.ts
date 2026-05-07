@@ -2,6 +2,7 @@
 import { reduce } from '../game/reducer.js';
 import type { GameState, GameSetup } from '../game/types.js';
 import { Code } from '../game/codes.js';
+import { runAITurn } from '../game/ai/index.js';
 
 function parseArgs(argv: string[]): { seed: number } {
   let seed = Date.now() & 0xffffffff;
@@ -18,10 +19,10 @@ function parseArgs(argv: string[]): { seed: number } {
 
 const setup: GameSetup = {
   players: [
-    { color: 'red', name: 'Red', persona: 'human' },
+    { color: 'red', name: 'Red', persona: 'aggressive' },
     { color: 'blue', name: 'Blue', persona: 'aggressive' },
-    { color: 'cyan', name: 'Cyan', persona: 'defensive' },
-    { color: 'purple', name: 'Purple', persona: 'passive' },
+    { color: 'cyan', name: 'Cyan', persona: 'aggressive' },
+    { color: 'purple', name: 'Purple', persona: 'aggressive' },
   ],
   citiesToWin: 5,
   elementOfChance: 'high',
@@ -90,56 +91,30 @@ for (const t of s.territories) {
     console.log(`  T${t.id} (${owner})`);
   }
 }
-// --- Trade & Shipment ---
+// Advance past production to the next phase
 console.log('\n--- End-of-production transition ---');
 s = reduce(s, { kind: 'endPhase', player: s.currentPlayer });
 console.log(`Phase after endPhase from production: ${s.currentPhase}`);
 
-if (s.currentPhase === 'trade') {
-  console.log('\n--- Trade phase (each player ends in turn) ---');
-  for (let i = 0; i < s.players.length; i++) {
-    s = reduce(s, { kind: 'endPhase', player: s.currentPlayer });
-    console.log(`Player ${s.players[s.currentPlayer]!.name} now active; phase=${s.currentPhase}`);
-    if (s.currentPhase !== 'trade') break;
+// --- AI self-play ---
+console.log('\n--- AI self-play ---');
+const MAX_YEAR = 30;
+let lastYear = s.year;
+while (s.year <= MAX_YEAR && s.currentPhase !== 'gameOver') {
+  s = runAITurn(s);
+  if (s.year !== lastYear) {
+    const cities = s.players.map((p, i) =>
+      `${p.name}=${s.territories.filter((t) => t.ownerId === i && t.hasCity).length}`,
+    ).join(', ');
+    console.log(`  year ${lastYear} → ${s.year}; cities: ${cities}`);
+    lastYear = s.year;
   }
 }
 
-if (s.currentPhase === 'shipment') {
-  console.log('\n--- Shipment phase (each player ends in turn) ---');
-  for (let i = 0; i < s.players.length; i++) {
-    s = reduce(s, { kind: 'endPhase', player: s.currentPlayer });
-    console.log(`Player ${s.players[s.currentPlayer]!.name} now active; phase=${s.currentPhase}`);
-    if (s.currentPhase !== 'shipment') break;
-  }
+if (s.currentPhase === 'gameOver') {
+  const winner = s.log.slice().reverse().find((l) => /won the game/i.test(l.message));
+  console.log(`\nGame over! ${winner?.message ?? '(no winner found in log)'}`);
+} else {
+  console.log(`\nReached MAX_YEAR=${MAX_YEAR} without gameOver. Final phase: ${s.currentPhase}`);
 }
-
-// --- Drive multi-year simulation ---
-const TARGET_YEAR = 3;
-console.log(`\n--- Driving simulation to year ${TARGET_YEAR + 1} ---`);
-
-while (s.year <= TARGET_YEAR && s.currentPhase !== 'gameOver') {
-  const yearAtStart = s.year;
-  const phaseAtStart = s.currentPhase;
-  switch (s.currentPhase) {
-    case 'production': {
-      s = reduce(s, { kind: 'production' });
-      s = reduce(s, { kind: 'endPhase', player: s.currentPlayer });
-      break;
-    }
-    case 'trade':
-    case 'shipment':
-    case 'conquest':
-    case 'development': {
-      s = reduce(s, { kind: 'endPhase', player: s.currentPlayer });
-      break;
-    }
-    default:
-      s = reduce(s, { kind: 'endPhase', player: s.currentPlayer });
-  }
-  if (s.year !== yearAtStart) {
-    console.log(`  year ${yearAtStart} → ${s.year}; phase ${phaseAtStart} → ${s.currentPhase}`);
-  }
-}
-
-console.log(`\nFinal phase reached: ${s.currentPhase} (year ${s.year})`);
 console.log(`Total log entries: ${s.log.length}`);
