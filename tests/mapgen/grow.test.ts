@@ -62,6 +62,27 @@ describe('growToBudget', () => {
   });
 });
 
+import { rollbackTerritory } from '../../src/game/mapgen/grow.js';
+
+describe('rollbackTerritory', () => {
+  it('clears all squares assigned to the given territory id', () => {
+    const sq = initBoard(false);
+    sq[100]!.territoryId = 0;
+    sq[101]!.territoryId = 0;
+    sq[102]!.territoryId = 0;
+    rollbackTerritory(sq, 0);
+    expect(sq.filter((s) => s.territoryId === 0)).toHaveLength(0);
+  });
+
+  it('leaves other territories alone', () => {
+    const sq = initBoard(false);
+    sq[100]!.territoryId = 0;
+    sq[200]!.territoryId = 1;
+    rollbackTerritory(sq, 0);
+    expect(sq.filter((s) => s.territoryId === 1)).toHaveLength(1);
+  });
+});
+
 describe('growOnce (irregular)', () => {
   it('jumps 2 squares in same direction when possible (so square count grows by 2)', () => {
     const sq = initBoard(false);

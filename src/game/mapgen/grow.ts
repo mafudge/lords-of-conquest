@@ -87,3 +87,9 @@ export function growToBudget(
   }
   return count;
 }
+
+export function rollbackTerritory(squares: Square[], terrId: number): void {
+  for (const s of squares) {
+    if (s.territoryId === terrId) s.territoryId = null;
+  }
+}
