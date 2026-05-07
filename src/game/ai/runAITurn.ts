@@ -2,12 +2,9 @@ import type { GameState } from '../types.js';
 import type { Plan } from '../plans.js';
 import { reduce } from '../reducer.js';
 import { decideAction } from './decideAction.js';
+import { decideTradeAction } from './trade.js';
 
 const MAX_ITER = 1000;
-
-function decideTradeActionStub(): boolean {
-  throw new Error('decideTradeAction not implemented yet (Task 17)');
-}
 
 function decideAlliesActionStub(): 'attacker' | 'neutral' | 'defender' {
   throw new Error('decideAlliesAction not implemented yet (Task 22)');
@@ -22,7 +19,7 @@ export function runAITurn(state: GameState): GameState {
     if (s.pendingTrade && s.pendingTrade.status === 'proposed') {
       const tradee = s.pendingTrade.tradeeId;
       if (s.players[tradee]!.persona === 'human') return s;
-      const accept = decideTradeActionStub();
+      const accept = decideTradeAction(s, tradee, s.pendingTrade);
       s = reduce(s, { kind: 'tradeResponse', accept });
       continue;
     }
