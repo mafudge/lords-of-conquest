@@ -39,6 +39,29 @@ describe('growOnce (regular)', () => {
   });
 });
 
+import { growToBudget } from '../../src/game/mapgen/grow.js';
+
+describe('growToBudget', () => {
+  it('grows the territory to roughly the budget on an open board', () => {
+    const sq = initBoard(false);
+    sq[100]!.territoryId = 0;
+    const r = createRng(7);
+    const placed = growToBudget(sq, r, 0, 'regular', 12);
+    expect(placed).toBeGreaterThanOrEqual(11); // 1 seed + ~11 growth
+    expect(placed).toBeLessThanOrEqual(13);
+    expect(sq.filter((s) => s.territoryId === 0)).toHaveLength(placed);
+  });
+
+  it('stops early if no growable parts remain', () => {
+    const sq = initBoard(false);
+    sq[100]!.territoryId = 0;
+    sq[99]!.territoryId = 1;   sq[101]!.territoryId = 1;
+    sq[60]!.territoryId = 1;   sq[140]!.territoryId = 1;
+    const r = createRng(8);
+    expect(growToBudget(sq, r, 0, 'regular', 50)).toBe(1);
+  });
+});
+
 describe('growOnce (irregular)', () => {
   it('jumps 2 squares in same direction when possible (so square count grows by 2)', () => {
     const sq = initBoard(false);

@@ -1,5 +1,5 @@
 import type { Square, MapParams } from '../types.js';
-import { type RngState, nextInt, nextFloat } from '../rng.js';
+import { type RngState, nextInt } from '../rng.js';
 import { GRID_WIDTH, GRID_HEIGHT } from '../constants.js';
 
 // 4-neighbor offsets in clockwise order from East — matches LocApplet's
@@ -69,4 +69,21 @@ export function growOnce(
     }
   }
   return false;
+}
+
+// Grow `terrId` until it has `budget` squares OR no further growth is possible.
+// Returns the actual number of squares now claimed by the territory.
+export function growToBudget(
+  squares: Square[],
+  r: RngState,
+  terrId: number,
+  shapes: MapParams['shapes'],
+  budget: number,
+): number {
+  let count = squares.reduce((n, s) => n + (s.territoryId === terrId ? 1 : 0), 0);
+  while (count < budget) {
+    if (!growOnce(squares, r, terrId, shapes)) break;
+    count = squares.reduce((n, s) => n + (s.territoryId === terrId ? 1 : 0), 0);
+  }
+  return count;
 }
