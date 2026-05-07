@@ -2,6 +2,7 @@ import type { GameState } from './types.js';
 import type { Plan } from './plans.js';
 import { applyNewGame } from './reducers/newGame.js';
 import { applySelection } from './reducers/selection.js';
+import { applyEndPhase } from './reducers/endPhase.js';
 
 const NOT_IMPLEMENTED_KINDS: ReadonlyArray<Plan['kind']> = [
   'trade', 'tradeResponse', 'tradeRejectAll', 'horseFrom', 'horseTo',
@@ -17,11 +18,12 @@ export function reduce(state: GameState, plan: Plan): GameState {
     case 'selection':
       return applySelection(state, plan.player, plan.territoryId);
     case 'production':
-    case 'endPhase':
     case 'savegame':
     case 'loadgame':
     case 'loadmap':
       throw new Error(`Reducer dispatch for ${plan.kind} is wired in a later task`);
+    case 'endPhase':
+      return applyEndPhase(state, plan.player);
     default: {
       // Distinguish between "Plan 3 territory" and "completely unknown"
       const kind = (plan as { kind?: string }).kind;
