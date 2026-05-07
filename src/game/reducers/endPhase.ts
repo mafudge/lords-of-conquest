@@ -68,6 +68,55 @@ export function applyEndPhase(prev: GameState, _player: PlayerId): GameState {
         ],
       };
     }
+    case 'trade': {
+      if (prev.pendingTrade !== null) {
+        throw new Error(`Cannot end trade with a pending trade in flight`);
+      }
+      const idx = prev.turnOrder.indexOf(prev.currentPlayer);
+      const nextIdx = (idx + 1) % prev.turnOrder.length;
+      if (nextIdx !== 0) {
+        return {
+          ...prev,
+          currentPlayer: prev.turnOrder[nextIdx]!,
+          log: [
+            ...prev.log,
+            { year: prev.year, phase: 'trade', player: prev.turnOrder[nextIdx]!,
+              message: `Player ${prev.turnOrder[nextIdx]} begins trading` },
+          ],
+        };
+      }
+      // Wrapped — advance to shipment with 1/6 skip
+      const rng = { seed: prev.seed, cursor: prev.rngCursor };
+      const skipRoll = nextFloat(rng);
+      if (skipRoll < PHASE_SKIP_PROBABILITY) {
+        const reason = pickReason(rng);
+        return {
+          ...prev,
+          rngCursor: rng.cursor,
+          currentPhase: 'conquest',
+          currentPlayer: prev.turnOrder[0]!,
+          shipmentUsed: false,
+          attackNumber: 1,
+          log: [
+            ...prev.log,
+            { year: prev.year, phase: 'shipment', player: prev.currentPlayer,
+              message: `Shipment skipped: ${reason}` },
+          ],
+        };
+      }
+      return {
+        ...prev,
+        rngCursor: rng.cursor,
+        currentPhase: 'shipment',
+        currentPlayer: prev.turnOrder[0]!,
+        shipmentUsed: false,
+        log: [
+          ...prev.log,
+          { year: prev.year, phase: 'shipment', player: prev.turnOrder[0]!,
+            message: 'Shipment phase begins' },
+        ],
+      };
+    }
     default:
       throw new Error(`endPhase from ${prev.currentPhase} is not implemented in plan 2 (Plan 3 territory)`);
   }

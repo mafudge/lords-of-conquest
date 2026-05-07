@@ -57,3 +57,45 @@ describe('endPhase: production → trade', () => {
     expect(messages).toMatch(/2 players|skipped/i);
   });
 });
+
+describe('endPhase: trade rotation', () => {
+  it('rotates currentPlayer within trade until wrap', () => {
+    let s = inProductionDone(setup3, 999);
+    s = reduce(s, { kind: 'endPhase', player: s.currentPlayer });
+    if (s.currentPhase !== 'trade') return; // skipped — skip this test
+    for (let i = 0; i < s.players.length - 1; i++) {
+      const before = s.currentPlayer;
+      s = reduce(s, { kind: 'endPhase', player: s.currentPlayer });
+      if (s.currentPhase === 'trade') {
+        expect(s.currentPlayer).not.toBe(before);
+      }
+    }
+  });
+
+  it('after the last player ends trade, advances to shipment', () => {
+    let s = inProductionDone(setup3, 999);
+    s = reduce(s, { kind: 'endPhase', player: s.currentPlayer });
+    if (s.currentPhase !== 'trade') return;
+    for (let i = 0; i < s.players.length; i++) {
+      s = reduce(s, { kind: 'endPhase', player: s.currentPlayer });
+    }
+    // After wrap, either shipment or conquest (if shipment skipped)
+    expect(['shipment', 'conquest']).toContain(s.currentPhase);
+  });
+
+  it('rejects endPhase from trade when pendingTrade is in flight', () => {
+    let s = inProductionDone(setup3, 100);
+    s = reduce(s, { kind: 'endPhase', player: s.currentPlayer });
+    if (s.currentPhase !== 'trade') return;
+    s.players[s.currentPlayer]!.stockpile = [3, 0, 0, 0, 0];
+    s.players[(s.currentPlayer + 1) % s.players.length]!.stockpile = [0, 3, 0, 0, 0];
+    s = reduce(s, {
+      kind: 'trade',
+      proposer: s.currentPlayer,
+      tradee: ((s.currentPlayer + 1) % s.players.length) as 0 | 1 | 2,
+      give: [1, 0, 0, 0, 0], receive: [0, 1, 0, 0, 0],
+    });
+    expect(() => reduce(s, { kind: 'endPhase', player: s.currentPlayer }))
+      .toThrow(/pending trade/i);
+  });
+});
