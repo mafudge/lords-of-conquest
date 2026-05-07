@@ -8,3 +8,12 @@ export function combination(n: number, k: number): number {
   }
   return Math.round(result);
 }
+
+export function probSuccess(att: number, def: number): number {
+  if (att <= 0) return 0;
+  if (def <= 0) return 1;
+  if (att === 1) return Math.pow(0.5, def);
+  if (def === 1) return 1 - Math.pow(0.5, att);
+  // General case implemented in Task 9
+  throw new Error('General case not implemented yet');
+}
