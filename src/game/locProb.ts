@@ -14,6 +14,9 @@ export function probSuccess(att: number, def: number): number {
   if (def <= 0) return 1;
   if (att === 1) return Math.pow(0.5, def);
   if (def === 1) return 1 - Math.pow(0.5, att);
-  // General case implemented in Task 9
-  throw new Error('General case not implemented yet');
+  let sum = 0;
+  for (let k = 0; k < att; k++) {
+    sum += combination(att + def - 1, k);
+  }
+  return sum / Math.pow(2, att + def - 1);
 }

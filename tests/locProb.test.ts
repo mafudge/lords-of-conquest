@@ -45,3 +45,22 @@ describe('probSuccess base cases', () => {
     expect(probSuccess(5, 1)).toBeCloseTo(1 - 1 / 32, 10);
   });
 });
+
+describe('probSuccess general case', () => {
+  it('symmetric attack 2v2 ≈ 0.5', () => {
+    expect(probSuccess(2, 2)).toBeCloseTo(0.5, 10);
+  });
+  it('larger attacker wins more often', () => {
+    expect(probSuccess(5, 3)).toBeGreaterThan(0.5);
+    expect(probSuccess(10, 3)).toBeGreaterThan(probSuccess(5, 3));
+  });
+  it('matches Gettman formula for 3v3', () => {
+    // Σ C(att+def-1, k) for k=0..att-1, divided by 2^(att+def-1)
+    // For (3,3): (C(5,0) + C(5,1) + C(5,2)) / 2^5 = (1 + 5 + 10) / 32 = 16/32 = 0.5
+    expect(probSuccess(3, 3)).toBeCloseTo(0.5, 10);
+  });
+  it('matches Gettman formula for 4v2', () => {
+    // (C(5,0)+C(5,1)+C(5,2)+C(5,3))/32 = (1+5+10+10)/32 = 26/32 = 0.8125
+    expect(probSuccess(4, 2)).toBeCloseTo(0.8125, 10);
+  });
+});
