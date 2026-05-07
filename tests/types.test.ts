@@ -39,8 +39,10 @@ describe('types', () => {
     expect(p.numTerritories).toBe(24);
   });
 
-  it('Board has squares and territories arrays', () => {
-    const b: Board = { squares: [], territories: [] };
+  it('Board has squares, territories, touching, and distance', () => {
+    const b: Board = { squares: [], territories: [], touching: [], distance: [] };
     expect(b.squares).toHaveLength(0);
+    expect(b.touching).toHaveLength(0);
+    expect(b.distance).toHaveLength(0);
   });
 });

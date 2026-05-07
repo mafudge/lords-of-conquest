@@ -9,7 +9,9 @@ describe('AI constants', () => {
     expect(A.ptCanBuildCity).toBe(8);
     expect(A.ptCanBuildWeapon).toBe(3);
     expect(A.ptCanBuildBoat).toBe(2);
+    expect(A.ptExistingHorses).toBe(1);
     expect(A.ptTerrWRes).toBe(2);
+    expect(A.ptOppCity).toBe(-8);
     expect(A.ptOppWinCity).toBe(-10000);
     expect(A.ptFCAdvOwnTerr).toBe(1);
     expect(A.ptFCAdvOppTerr).toBe(1);

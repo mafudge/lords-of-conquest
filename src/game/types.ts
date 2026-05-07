@@ -41,9 +41,10 @@ export type MapParams = {
 export type Board = {
   squares: Square[];           // length GRID_WIDTH * GRID_HEIGHT
   territories: Territory[];    // length numTerritories
-  // Adjacency caches (built after generation)
-  touching?: boolean[][];      // [terrA][terrB] (square symmetric)
-  distance?: number[][];       // BFS hops between territories
+  // Adjacency caches — always populated by generateMap (and any future loader
+  // that produces a Board). Required so consumers don't need to null-check.
+  touching: boolean[][];       // [terrA][terrB] (symmetric)
+  distance: number[][];        // BFS hops between territories
 };
 
 export function sqIndex(x: number, y: number): number {
