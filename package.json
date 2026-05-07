@@ -8,7 +8,8 @@
     "test:watch": "vitest",
     "typecheck": "tsc --noEmit",
     "gen-map": "tsx src/cli/genMap.ts",
-    "play-game": "tsx src/cli/playGame.ts"
+    "play-game": "tsx src/cli/playGame.ts",
+    "save-load-smoke": "tsx src/cli/saveLoadSmoke.ts"
   },
   "devDependencies": {
     "@types/node": "^20.11.30",
