@@ -96,6 +96,7 @@ export function applyEndPhase(prev: GameState, _player: PlayerId): GameState {
           currentPhase: 'conquest',
           currentPlayer: prev.turnOrder[0]!,
           shipmentUsed: false,
+          shipmentForfeitsSecondAttack: false,
           attackNumber: 1,
           log: [
             ...prev.log,
@@ -110,10 +111,41 @@ export function applyEndPhase(prev: GameState, _player: PlayerId): GameState {
         currentPhase: 'shipment',
         currentPlayer: prev.turnOrder[0]!,
         shipmentUsed: false,
+        shipmentForfeitsSecondAttack: false,
         log: [
           ...prev.log,
           { year: prev.year, phase: 'shipment', player: prev.turnOrder[0]!,
             message: 'Shipment phase begins' },
+        ],
+      };
+    }
+    case 'shipment': {
+      const idx = prev.turnOrder.indexOf(prev.currentPlayer);
+      const nextIdx = (idx + 1) % prev.turnOrder.length;
+      if (nextIdx !== 0) {
+        return {
+          ...prev,
+          currentPlayer: prev.turnOrder[nextIdx]!,
+          shipmentUsed: false,
+          shipmentForfeitsSecondAttack: false,
+          log: [
+            ...prev.log,
+            { year: prev.year, phase: 'shipment', player: prev.turnOrder[nextIdx]!,
+              message: `Player ${prev.turnOrder[nextIdx]} begins shipment` },
+          ],
+        };
+      }
+      return {
+        ...prev,
+        currentPhase: 'conquest',
+        currentPlayer: prev.turnOrder[0]!,
+        attackNumber: 1,
+        shipmentUsed: false,
+        shipmentForfeitsSecondAttack: false,
+        log: [
+          ...prev.log,
+          { year: prev.year, phase: 'conquest', player: prev.turnOrder[0]!,
+            message: 'Conquest phase begins' },
         ],
       };
     }

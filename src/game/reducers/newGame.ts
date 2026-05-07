@@ -63,6 +63,7 @@ export function applyNewGame(
     year: 1,
     attackNumber: 1,
     shipmentUsed: false,
+    shipmentForfeitsSecondAttack: false,
     pendingTrade: null,
     pendingCombat: null,
     rejectedTrades: [],

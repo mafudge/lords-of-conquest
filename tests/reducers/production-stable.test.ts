@@ -25,7 +25,7 @@ function injectState(territories: Partial<Territory>[], touching: boolean[][]): 
       { id: 1, name: 'b', color: 'blue', persona: 'human', status: 'playing', stockpile: [0, 0, 0, 0, 0], stockpileLocation: null },
     ],
     turnOrder: [0, 1], currentPhase: 'production', currentPlayer: 0,
-    year: 1, attackNumber: 1, shipmentUsed: false,
+    year: 1, attackNumber: 1, shipmentUsed: false, shipmentForfeitsSecondAttack: false,
     pendingTrade: null, pendingCombat: null,
     rejectedTrades: [], autoReject: [[false, false], [false, false]],
     log: [],

@@ -48,6 +48,7 @@ export function applyLoadmap(prev: GameState, mapText: string): GameState {
     year: 1,
     attackNumber: 1,
     shipmentUsed: false,
+    shipmentForfeitsSecondAttack: false,
     pendingTrade: null,
     pendingCombat: null,
     rejectedTrades: [],
