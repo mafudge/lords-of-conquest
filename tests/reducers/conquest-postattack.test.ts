@@ -165,3 +165,16 @@ describe('post-attack: stockpile transfer', () => {
     expect(out.players[1]!.stockpile).toEqual([3, 2, 1, 4, 0]);
   });
 });
+
+describe('post-attack: city activation sweep', () => {
+  it('newly captured territory loses doubles when defender city de-activated', () => {
+    const { state: s, target } = combatReady(5, 3);
+    const adjOwned = s.territories.find((t) =>
+      t.id !== target && t.ownerId === 1 && s.touching[t.id]?.[target])!;
+    s.territories[adjOwned.id]!.hasCity = true;
+    s.territories[target]!.resource = 0;
+    s.territories[target]!.hasResourceDouble = true;
+    const out = reduce(s, { kind: 'resolveCombat' });
+    expect(out.territories[target]!.hasResourceDouble).toBe(false);
+  });
+});
