@@ -3,6 +3,7 @@ import type { Plan } from './plans.js';
 import { applyNewGame } from './reducers/newGame.js';
 import { applySelection } from './reducers/selection.js';
 import { applyEndPhase } from './reducers/endPhase.js';
+import { applyProduction } from './reducers/production.js';
 
 const NOT_IMPLEMENTED_KINDS: ReadonlyArray<Plan['kind']> = [
   'trade', 'tradeResponse', 'tradeRejectAll', 'horseFrom', 'horseTo',
@@ -18,6 +19,7 @@ export function reduce(state: GameState, plan: Plan): GameState {
     case 'selection':
       return applySelection(state, plan.player, plan.territoryId);
     case 'production':
+      return applyProduction(state);
     case 'savegame':
     case 'loadgame':
     case 'loadmap':
