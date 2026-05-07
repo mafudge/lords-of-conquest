@@ -62,8 +62,8 @@ export function getTradeUtility(
   // Java nArray7[n22] += getTradeAmount(0,..) - getTradeAmount(1,..)  (tradee post)
   // Java nArray7[n21] += getTradeAmount(1,..) - getTradeAmount(0,..)  (proposer post)
   for (let i = 0; i < 5; i++) {
-    myPost[i]  = myPost[i]  - myGive[i]    + myReceive[i];
-    oppPost[i] = oppPost[i] - myReceive[i] + myGive[i];
+    myPost[i]  = (myPost[i]  ?? 0) - (myGive[i]    ?? 0) + (myReceive[i] ?? 0);
+    oppPost[i] = (oppPost[i] ?? 0) - (myReceive[i] ?? 0) + (myGive[i]   ?? 0);
   }
 
   // --- Stockpile point deltas (n17, n3, n18, n19 in Java) ------------------

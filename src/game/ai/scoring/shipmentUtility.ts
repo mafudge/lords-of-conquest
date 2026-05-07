@@ -110,7 +110,7 @@ export function getShipmentUtility(
 
     // Compute boolean flags only when the plan is valid (Java L2557 guard:
     // shipmentPlan != null && getShipment() != -1 && n6 > -1)
-    if (shipWhat !== -1 && terrMoveTo > -1) {
+    if (terrMoveTo > -1) {
 
       if (shipWhat === 6) {
         // shipHorse (Java L2563–L2581)

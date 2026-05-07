@@ -17,7 +17,7 @@ describe('decideDevelopmentAction', () => {
     s = { ...s, currentPhase: 'development', currentPlayer: 0 };
     const plan = decideDevelopmentAction(s, 0);
     expect(['buildCity', 'buildWeapon', 'buildBoat', 'endPhase']).toContain(plan.kind);
-    if (plan.kind !== 'endPhase') {
+    if (plan.kind === 'buildCity' || plan.kind === 'buildWeapon' || plan.kind === 'buildBoat') {
       expect(plan.player).toBe(0);
     }
   });

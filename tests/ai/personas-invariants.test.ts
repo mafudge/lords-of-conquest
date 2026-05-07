@@ -10,7 +10,7 @@ describe('persona invariants — passive', () => {
     let s = seededState({ seed: 42, personas: ['passive', 'aggressive', 'aggressive'] });
     s = setStockpile(s, 0, [9, 9, 9, 9, 9]);
     for (const phase of ['trade', 'shipment', 'conquest', 'development'] as const) {
-      const sp = { ...s, currentPhase: phase, currentPlayer: 0, attackNumber: 1, shipmentUsed: false };
+      const sp = { ...s, currentPhase: phase, currentPlayer: 0 as const, attackNumber: 1 as const, shipmentUsed: false };
       const plan = decideAction(sp, 0);
       expect(plan.kind).toBe('endPhase');
     }
