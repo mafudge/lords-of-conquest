@@ -8,10 +8,9 @@ import { applySavegame, applyLoadgame } from './reducers/persistence.js';
 import { applyLoadmap } from './reducers/loadmap.js';
 import { applyTradePropose, applyTradeResponse, applyHorseFrom, applyHorseTo, applyTradeRejectAll } from './reducers/trade.js';
 import { applyShipStockpile, applyShipHorse, applyShipWeapon, applyShipBoat } from './reducers/shipment.js';
-import { applyAttack, applyAlliesDecision } from './reducers/conquest.js';
+import { applyAttack, applyAlliesDecision, applyResolveCombat } from './reducers/conquest.js';
 
 const NOT_IMPLEMENTED_KINDS: ReadonlyArray<Plan['kind']> = [
-  'resolveCombat',
   'buildCity', 'buildWeapon', 'buildBoat',
 ];
 
@@ -53,6 +52,8 @@ export function reduce(state: GameState, plan: Plan): GameState {
       return applyAttack(state, plan);
     case 'alliesDecision':
       return applyAlliesDecision(state, plan.player, plan.choice);
+    case 'resolveCombat':
+      return applyResolveCombat(state);
     default: {
       // Distinguish between "Plan 3 territory" and "completely unknown"
       const kind = (plan as { kind?: string }).kind;

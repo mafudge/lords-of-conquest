@@ -1,5 +1,7 @@
 import type { GameState, PlayerId, Territory } from '../types.js';
 import { getCombatStrength, listAllyCandidates, isAutoPreventSuicide } from '../combat.js';
+import { nextFloat } from '../rng.js';
+import { probSuccess } from '../locProb.js';
 
 export type AttackInput = {
   player: PlayerId;
@@ -186,6 +188,57 @@ export function applyAlliesDecision(
       ...prev.log,
       { year: prev.year, phase: 'conquest', player,
         message: `Allies decision: ${choice}` },
+    ],
+  };
+}
+
+export function applyResolveCombat(prev: GameState): GameState {
+  if (prev.currentPhase !== 'conquest') {
+    throw new Error(`resolveCombat illegal during ${prev.currentPhase} phase`);
+  }
+  const c = prev.pendingCombat;
+  if (!c || c.resolved) throw new Error(`No active combat to resolve`);
+  if (c.alliesPending.size > 0) {
+    throw new Error(`Cannot resolve: ${c.alliesPending.size} allies still pending`);
+  }
+  const chance = prev.setup.elementOfChance;
+  let attackerWon: boolean;
+  let nextRngCursor = prev.rngCursor;
+  if (chance === 'low') {
+    attackerWon = c.attackerStrength >= c.defenderStrength;
+  } else if (chance === 'medium') {
+    if (c.attackerStrength > c.defenderStrength) attackerWon = true;
+    else if (c.attackerStrength < c.defenderStrength) attackerWon = false;
+    else {
+      const rng = { seed: prev.seed, cursor: prev.rngCursor };
+      attackerWon = nextFloat(rng) < 0.5;
+      nextRngCursor = rng.cursor;
+    }
+  } else {
+    const rng = { seed: prev.seed, cursor: prev.rngCursor };
+    let att = c.attackerStrength;
+    let def = c.defenderStrength;
+    while (att > 0 && def > 0) {
+      if (nextFloat(rng) < 0.5) att--;
+      else def--;
+    }
+    attackerWon = def === 0;
+    nextRngCursor = rng.cursor;
+  }
+  const probability = chance === 'high'
+    ? probSuccess(c.attackerStrength, c.defenderStrength)
+    : null;
+  const probMsg = probability !== null
+    ? ` (P(att-win)=${probability.toFixed(3)})`
+    : '';
+  return {
+    ...prev,
+    rngCursor: nextRngCursor,
+    pendingCombat: { ...c, resolved: true, attackerWon },
+    log: [
+      ...prev.log,
+      { year: prev.year, phase: 'conquest', player: c.attackerId,
+        message: `Combat resolved: ${attackerWon ? 'attacker won' : 'attacker lost'}${probMsg}` },
     ],
   };
 }
