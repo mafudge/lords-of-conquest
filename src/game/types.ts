@@ -140,6 +140,8 @@ export type GameState = {
   setup: GameSetup;
   squares: Square[];
   territories: Territory[];
+  touching: boolean[][];               // [terrA][terrB] (symmetric)
+  distance: number[][];                // BFS hops between territories
   boats: Array<Boat | null>;          // 256-slot pool; null = invalid slot
   players: Player[];                   // length 2..7
   turnOrder: PlayerId[];               // current rotation

@@ -18,7 +18,7 @@ const minimalState = (): GameState => ({
       resourceDensity: { kind: 'fixed', level: 'medium' },
     },
   },
-  squares: [], territories: [], boats: [], players: [],
+  squares: [], territories: [], touching: [], distance: [], boats: [], players: [],
   turnOrder: [], currentPhase: 'setup', currentPlayer: 0,
   year: 0, attackNumber: 1, shipmentUsed: false,
   pendingTrade: null, pendingCombat: null,

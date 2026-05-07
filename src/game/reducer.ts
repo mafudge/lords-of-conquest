@@ -1,5 +1,6 @@
 import type { GameState } from './types.js';
 import type { Plan } from './plans.js';
+import { applyNewGame } from './reducers/newGame.js';
 
 const NOT_IMPLEMENTED_KINDS: ReadonlyArray<Plan['kind']> = [
   'trade', 'tradeResponse', 'tradeRejectAll', 'horseFrom', 'horseTo',
@@ -11,6 +12,7 @@ const NOT_IMPLEMENTED_KINDS: ReadonlyArray<Plan['kind']> = [
 export function reduce(state: GameState, plan: Plan): GameState {
   switch (plan.kind) {
     case 'newGame':
+      return applyNewGame(state, plan.setup, plan.seed);
     case 'selection':
     case 'production':
     case 'endPhase':
