@@ -25,3 +25,24 @@ export function buildTouching(squares: Square[], numTerritories: number): boolea
   }
   return t;
 }
+
+// BFS shortest-hop distance between territories. Self-distance is 0; unreachable
+// pairs are Infinity.
+export function buildDistance(touching: boolean[][]): number[][] {
+  const n = touching.length;
+  const d: number[][] = Array.from({ length: n }, () => new Array<number>(n).fill(Infinity));
+  for (let s = 0; s < n; s++) {
+    d[s]![s] = 0;
+    const queue: number[] = [s];
+    while (queue.length) {
+      const cur = queue.shift()!;
+      for (let nb = 0; nb < n; nb++) {
+        if (touching[cur]![nb] && d[s]![nb] === Infinity) {
+          d[s]![nb] = d[s]![cur]! + 1;
+          queue.push(nb);
+        }
+      }
+    }
+  }
+  return d;
+}
