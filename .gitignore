@@ -21,3 +21,6 @@ npm-debug.log*
 
 # Brainstorming session artifacts (Claude Code superpowers)
 .superpowers/
+
+# Decompiled Gettman source — used as implementation reference, not redistributed
+.reference/
