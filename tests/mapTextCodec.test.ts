@@ -27,6 +27,47 @@ describe('encodeMap', () => {
   });
 });
 
+describe('decodeMap (validation)', () => {
+  it('returns -2 if any territory has fewer than 7 squares', () => {
+    const sq = initBoard(false);
+    sq[0]!.territoryId = 0;        // 1 square — too small
+    for (let i = 40; i < 47; i++) sq[i]!.territoryId = 1;
+    const text = encodeMap(sq);
+    const r = decodeMap(text);
+    expect(r.kind).toBe('error');
+    if (r.kind === 'error') expect(r.code).toBe(-2);
+  });
+
+  it('returns -3 if numTerritories is below 20 (when also given numPlayers >= 2)', () => {
+    const sq = initBoard(false);
+    // 5 territories of 7 squares each
+    for (let t = 0; t < 5; t++) for (let i = 0; i < 7; i++) sq[t * 40 + i]!.territoryId = t;
+    const text = encodeMap(sq);
+    const r = decodeMap(text, { numPlayers: 2 });
+    expect(r.kind).toBe('error');
+    if (r.kind === 'error') expect(r.code).toBe(-3);
+  });
+
+  it('returns -3 if territories < 7 × numPlayers', () => {
+    const sq = initBoard(false);
+    // 20 territories of 7 squares each (20 ≥ 20 OK), but 4P needs ≥ 28
+    for (let t = 0; t < 20; t++) for (let i = 0; i < 7; i++) {
+      const idx = t * 7 + (i < 7 ? i : 0);
+      if (idx < 800) sq[idx]!.territoryId = t;
+    }
+    const text = encodeMap(sq);
+    const r = decodeMap(text, { numPlayers: 4 });
+    if (r.kind === 'error') expect(r.code).toBe(-3);
+  });
+
+  it('returns -1 if a row is shorter than 40', () => {
+    const text = ['.....', ...Array(19).fill('.'.repeat(40))].join('\n');
+    const r = decodeMap(text);
+    expect(r.kind).toBe('error');
+    if (r.kind === 'error') expect(r.code).toBe(-1);
+  });
+});
+
 describe('decodeMap (happy path)', () => {
   it('round-trips a simple all-water map', () => {
     const sq = initBoard(false);

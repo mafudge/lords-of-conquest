@@ -27,9 +27,12 @@ const ALPHABET_INDEX: Record<string, number> = (() => {
   return m;
 })();
 
-export function decodeMap(text: string): DecodeResult {
+export type DecodeOptions = {
+  numPlayers?: number;
+};
+
+export function decodeMap(text: string, opts: DecodeOptions = {}): DecodeResult {
   const lines = text.split(/\r?\n/);
-  // Need at least 20 grid rows.
   if (lines.length < GRID_HEIGHT) {
     return { kind: 'error', code: -1, message: 'Fewer than 20 grid rows' };
   }
@@ -40,6 +43,7 @@ export function decodeMap(text: string): DecodeResult {
     }
   }
   const squares: Square[] = new Array(GRID_WIDTH * GRID_HEIGHT);
+  const territoryCounts = new Map<number, number>();
   let maxTerr = -1;
   for (let y = 0; y < GRID_HEIGHT; y++) {
     for (let x = 0; x < GRID_WIDTH; x++) {
@@ -52,6 +56,7 @@ export function decodeMap(text: string): DecodeResult {
         }
         tid = idx;
         if (idx > maxTerr) maxTerr = idx;
+        territoryCounts.set(idx, (territoryCounts.get(idx) ?? 0) + 1);
       }
       squares[y * GRID_WIDTH + x] = {
         x, y, territoryId: tid, lakeId: null, isBoundaryWater: false,
@@ -59,5 +64,18 @@ export function decodeMap(text: string): DecodeResult {
     }
   }
   const numTerritories = maxTerr + 1;
+  // -2: any territory below 7 squares, OR exceeding 99
+  for (const [tid, count] of territoryCounts) {
+    if (count < 7 || count > 99) {
+      return { kind: 'error', code: -2, message: `Territory ${tid} has ${count} squares (need 7..99)` };
+    }
+  }
+  // -3: numTerritories not in [20, 64], or fewer than 7 × numPlayers
+  if (opts.numPlayers !== undefined && numTerritories > 0 && (numTerritories < 20 || numTerritories > 64)) {
+    return { kind: 'error', code: -3, message: `Territory count ${numTerritories} not in [20, 64]` };
+  }
+  if (opts.numPlayers !== undefined && numTerritories < 7 * opts.numPlayers) {
+    return { kind: 'error', code: -3, message: `Need at least ${7 * opts.numPlayers} territories for ${opts.numPlayers} players` };
+  }
   return { kind: 'ok', squares, numTerritories };
 }
