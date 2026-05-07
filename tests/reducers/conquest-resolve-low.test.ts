@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { reduce } from '../../src/game/reducer.js';
-import type { GameState, GameSetup, CombatState } from '../../src/game/types.js';
+import type { GameState, GameSetup, CombatState, PlayerId } from '../../src/game/types.js';
 
 const setup: GameSetup = {
   players: [
@@ -39,7 +39,7 @@ function withCombat(att: number, def: number): GameState {
     fromTerritoryId: from, targetTerritoryId: target,
     boatId: null, horseFromTerritoryId: null, weaponFromTerritoryId: null,
     alliesDecisions: ['neutral', 'neutral'],
-    alliesPending: new Set<number>(),
+    alliesPending: new Set<PlayerId>(),
     attackerStrength: att, defenderStrength: def,
     resolved: false, attackerWon: false,
   };

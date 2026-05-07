@@ -28,7 +28,7 @@ const minimalState = (): GameState => ({
 describe('reducer', () => {
   it('throws "not implemented" for plan kinds not yet handled', () => {
     const state = minimalState();
-    const plan: Plan = { kind: 'resolveCombat' };
+    const plan: Plan = { kind: 'buildCity', player: 0, territoryId: 0, payInGold: false };
     expect(() => reduce(state, plan)).toThrow(/not implemented/i);
   });
 
