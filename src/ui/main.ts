@@ -18,6 +18,7 @@ import { openTradeBuilder } from './overlays/tradeBuilder.js';
 import { openTradeResponse } from './overlays/tradeResponse.js';
 import { openAlliesDialog } from './overlays/alliesDialog.js';
 import { conquestMode } from './interactions/conquestMode.js';
+import { developmentMode } from './interactions/developmentMode.js';
 
 let state: GameState | null = null;
 let prevState: GameState | null = null;
@@ -177,6 +178,21 @@ function defaultActionsFor(s: GameState): BarAction[] {
         } },
       { label: 'Finished Trading', kind: 'secondary',
         onClick: () => dispatch({ kind: 'endPhase', player: s.currentPlayer }) },
+    ];
+  }
+  if (s.currentPhase === 'development' && me?.persona === 'human') {
+    return [
+      { label: 'Build City', onClick: () => {
+        setMode(developmentMode); developmentMode.setSub('city'); developmentMode.enter(s);
+      } },
+      { label: 'Build Weapon', onClick: () => {
+        setMode(developmentMode); developmentMode.setSub('weapon'); developmentMode.enter(s);
+      } },
+      { label: 'Build Boat', onClick: () => {
+        setMode(developmentMode); developmentMode.setSub('boat'); developmentMode.enter(s);
+      } },
+      { label: 'End Development', kind: 'secondary', onClick: () =>
+        dispatch({ kind: 'endPhase', player: s.currentPlayer }) },
     ];
   }
   return [{ label: 'End Phase', kind: 'secondary',
