@@ -16,6 +16,7 @@ import { decideSelectionAction } from '../game/ai/selection.js';
 import { openTradeePicker } from './overlays/tradeePicker.js';
 import { openTradeBuilder } from './overlays/tradeBuilder.js';
 import { openTradeResponse } from './overlays/tradeResponse.js';
+import { conquestMode } from './interactions/conquestMode.js';
 
 let state: GameState | null = null;
 let prevState: GameState | null = null;
@@ -122,6 +123,14 @@ function defaultActionsFor(s: GameState): BarAction[] {
       { label: 'Skip Shipment', kind: 'secondary',
         onClick: () => dispatch({ kind: 'endPhase', player: s.currentPlayer }) },
     ];
+  }
+  if (s.currentPhase === 'conquest' && me?.persona === 'human') {
+    if (!s.pendingCombat) {
+      setMode(conquestMode);
+      conquestMode.enter(s);
+    }
+    return [{ label: 'End Conquest', kind: 'secondary',
+      onClick: () => dispatch({ kind: 'endPhase', player: s.currentPlayer }) }];
   }
   if (s.currentPhase === 'trade' && me?.persona === 'human') {
     return [
