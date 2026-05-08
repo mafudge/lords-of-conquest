@@ -29,3 +29,12 @@ html, body { margin: 0; padding: 0; height: 100%; background: var(--bg); color: 
 @keyframes flavor-fade {
   0% { opacity: 0; } 15% { opacity: 1; } 85% { opacity: 1; } 100% { opacity: 0; }
 }
+
+.tradee-picker { position: fixed; bottom: 100px; right: 16px;
+  background: var(--panel); border: 1px solid var(--border); border-radius: 6px;
+  padding: 8px; z-index: 800; }
+.tradee-picker .tradee { display: flex; align-items: center; gap: 6px;
+  background: transparent; color: var(--text); border: none; padding: 6px 10px;
+  cursor: pointer; width: 100%; text-align: left; }
+.tradee-picker .tradee:hover { background: rgba(255,255,255,0.05); }
+.tradee-picker .swatch { width: 12px; height: 12px; border-radius: 50%; }
