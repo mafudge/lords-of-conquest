@@ -20,7 +20,10 @@ export function stopRuntime(): void {
 function schedule(): void {
   if (scheduled || !running) return;
   scheduled = true;
-  queueMicrotask(async () => {
+  // Use setTimeout(0) rather than queueMicrotask so the event loop can process
+  // UI events and Playwright CDP messages between AI ticks. queueMicrotask would
+  // starve the event loop in fast-forward mode (no animation awaits to yield).
+  setTimeout(async () => {
     scheduled = false;
     if (!running) return;
     try {
@@ -31,7 +34,7 @@ function schedule(): void {
       return;
     }
     if (running) schedule();
-  });
+  }, 0);
 }
 
 async function dispatchAnimated(plan: Plan): Promise<void> {

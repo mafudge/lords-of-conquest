@@ -24,3 +24,7 @@ npm-debug.log*
 
 # Decompiled Gettman source — used as implementation reference, not redistributed
 .reference/
+
+# Playwright test output
+playwright-report/
+test-results/
