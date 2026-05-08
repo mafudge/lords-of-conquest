@@ -30,3 +30,10 @@
   font-family: inherit; font-size: 12px; }
 .btn-scouting:hover, .btn-menu:hover { background: rgba(255,255,255,0.04); }
 .status-banner { color: var(--muted); font-size: 13px; }
+.act { background: var(--panel); border: 1px solid var(--border);
+  color: var(--text); padding: 8px 14px; border-radius: 4px; cursor: pointer;
+  font-family: inherit; font-size: 13px; }
+.act:hover:not(:disabled) { background: rgba(255,255,255,0.06); }
+.act:disabled { opacity: 0.4; cursor: not-allowed; }
+.act-primary { background: var(--accent); border-color: var(--accent); color: white; }
+.act-destructive { background: #a14250; border-color: #a14250; color: white; }
