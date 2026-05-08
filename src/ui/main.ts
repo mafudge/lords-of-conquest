@@ -16,6 +16,7 @@ import { decideSelectionAction } from '../game/ai/selection.js';
 import { openTradeePicker } from './overlays/tradeePicker.js';
 import { openTradeBuilder } from './overlays/tradeBuilder.js';
 import { openTradeResponse } from './overlays/tradeResponse.js';
+import { openAlliesDialog } from './overlays/alliesDialog.js';
 import { conquestMode } from './interactions/conquestMode.js';
 
 let state: GameState | null = null;
@@ -79,6 +80,23 @@ function render(s: GameState, _prev?: GameState): void {
         onAccept: () => dispatch({ kind: 'tradeResponse', accept: true }),
         onReject: () => dispatch({ kind: 'tradeResponse', accept: false }),
         onRejectAll: () => dispatch({ kind: 'tradeRejectAll', tradee: s.pendingTrade!.tradeeId, trader: s.pendingTrade!.proposerId } as any),
+      });
+    }
+  }
+  if (s.pendingCombat && !s.pendingCombat.resolved
+      && [...s.pendingCombat.alliesPending].some((p) =>
+        s.players[p]?.persona === 'human')) {
+    if (!document.querySelector('.allies-dialog')) {
+      const human = [...s.pendingCombat.alliesPending].find((p) =>
+        s.players[p]?.persona === 'human')!;
+      const att = s.players[s.pendingCombat.attackerId];
+      const def = s.pendingCombat.defenderId !== null
+        ? s.players[s.pendingCombat.defenderId] : null;
+      openAlliesDialog({
+        attackerName: att?.name ?? '?',
+        defenderName: def?.name ?? 'Natives',
+        onChoice: (choice) => dispatch({ kind: 'alliesDecision',
+          player: human, choice } as any),
       });
     }
   }
