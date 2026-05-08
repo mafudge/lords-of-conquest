@@ -11,6 +11,7 @@ import { defaultSetupState } from './setup/state.js';
 import { getMode, setMode } from './interactions/interactionMode.js';
 import { selectionMode } from './interactions/selectionMode.js';
 import { locateStockpileMode } from './interactions/locateStockpileMode.js';
+import { shipmentMode } from './interactions/shipmentMode.js';
 import { decideSelectionAction } from '../game/ai/selection.js';
 import { openTradeePicker } from './overlays/tradeePicker.js';
 import { openTradeBuilder } from './overlays/tradeBuilder.js';
@@ -108,6 +109,20 @@ function defaultActionsFor(s: GameState): BarAction[] {
       } }];
   }
   const me = s.players[s.currentPlayer];
+  if (s.currentPhase === 'shipment' && me?.persona === 'human') {
+    if (s.shipmentUsed) {
+      return [{ label: 'End Shipment', kind: 'secondary',
+        onClick: () => dispatch({ kind: 'endPhase', player: s.currentPlayer }) }];
+    }
+    return [
+      { label: 'Move Stockpile', onClick: () => { setMode(shipmentMode); shipmentMode.setSub('stockpile'); shipmentMode.enter(s); } },
+      { label: 'Ship Horse', onClick: () => { setMode(shipmentMode); shipmentMode.setSub('horse'); shipmentMode.enter(s); } },
+      { label: 'Ship Weapon', onClick: () => { setMode(shipmentMode); shipmentMode.setSub('weapon'); shipmentMode.enter(s); } },
+      { label: 'Move Boat', onClick: () => { setMode(shipmentMode); shipmentMode.setSub('boat'); shipmentMode.enter(s); } },
+      { label: 'Skip Shipment', kind: 'secondary',
+        onClick: () => dispatch({ kind: 'endPhase', player: s.currentPlayer }) },
+    ];
+  }
   if (s.currentPhase === 'trade' && me?.persona === 'human') {
     return [
       { label: 'Propose Trade', kind: 'primary',
