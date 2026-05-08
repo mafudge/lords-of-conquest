@@ -13,6 +13,7 @@ import { selectionMode } from './interactions/selectionMode.js';
 import { locateStockpileMode } from './interactions/locateStockpileMode.js';
 import { decideSelectionAction } from '../game/ai/selection.js';
 import { openTradeePicker } from './overlays/tradeePicker.js';
+import { openTradeBuilder } from './overlays/tradeBuilder.js';
 
 let state: GameState | null = null;
 let prevState: GameState | null = null;
@@ -102,7 +103,20 @@ function defaultActionsFor(s: GameState): BarAction[] {
             .map((p) => ({ id: p.id, name: p.name, color: p.color }));
           openTradeePicker({
             candidates,
-            onPick: (_id) => { /* Task 24 opens trade builder */ console.log('trade with', _id); },
+            onPick: (tradeeId) => {
+              openTradeBuilder({
+                proposerId: s.currentPlayer, tradeeId,
+                proposerStock: s.players[s.currentPlayer]!.stockpile,
+                tradeeStock: s.players[tradeeId]!.stockpile,
+                onSend: (give, receive) => {
+                  dispatch({
+                    kind: 'trade', proposer: s.currentPlayer, tradee: tradeeId,
+                    give, receive,
+                  } as any);
+                },
+                onCancel: () => {},
+              });
+            },
           });
         } },
       { label: 'Finished Trading', kind: 'secondary',

@@ -38,3 +38,15 @@ html, body { margin: 0; padding: 0; height: 100%; background: var(--bg); color: 
   cursor: pointer; width: 100%; text-align: left; }
 .tradee-picker .tradee:hover { background: rgba(255,255,255,0.05); }
 .tradee-picker .swatch { width: 12px; height: 12px; border-radius: 50%; }
+
+.trade-builder .overlay-panel { width: 520px; }
+.tb-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.tb-give h3, .tb-receive h3 { font-size: 12px; color: var(--muted);
+  text-transform: uppercase; margin: 0 0 8px; }
+.counter { display: grid; grid-template-columns: 1fr 24px 30px 24px;
+  align-items: center; gap: 4px; margin-bottom: 4px; font-size: 12px; }
+.counter .cap { color: var(--muted); font-size: 10px; }
+.counter .dec, .counter .inc { background: var(--bg); border: 1px solid var(--border);
+  color: var(--text); padding: 2px 6px; cursor: pointer; border-radius: 3px; }
+.counter .val { text-align: center; font-variant-numeric: tabular-nums; }
+.tb-summary { color: var(--muted); font-size: 12px; margin: 8px 0; }
