@@ -28,4 +28,33 @@ describe('mountSetupWizard', () => {
     const btn = document.querySelector<HTMLButtonElement>('.btn-start');
     expect(btn).not.toBeNull();
   });
+
+  it('clicking + Add player adds a slot up to 7', () => {
+    mountSetupWizard(document.getElementById('app')!, {
+      initial: defaultSetupState(), onStart: () => {},
+    });
+    document.querySelector<HTMLButtonElement>('.btn-add-slot')!.click();
+    expect(document.querySelectorAll('.player-slot')).toHaveLength(5);
+    // Add up to 7
+    document.querySelector<HTMLButtonElement>('.btn-add-slot')!.click();
+    document.querySelector<HTMLButtonElement>('.btn-add-slot')!.click();
+    expect(document.querySelectorAll('.player-slot')).toHaveLength(7);
+    // 8th add should be no-op (button disabled)
+    const btn = document.querySelector<HTMLButtonElement>('.btn-add-slot')!;
+    btn.click();
+    expect(document.querySelectorAll('.player-slot')).toHaveLength(7);
+  });
+
+  it('clicking remove drops a slot, but keeps minimum 2', () => {
+    mountSetupWizard(document.getElementById('app')!, {
+      initial: defaultSetupState(), onStart: () => {},
+    });
+    document.querySelector<HTMLButtonElement>('.btn-remove-slot')!.click();
+    expect(document.querySelectorAll('.player-slot')).toHaveLength(3);
+    document.querySelector<HTMLButtonElement>('.btn-remove-slot')!.click();
+    expect(document.querySelectorAll('.player-slot')).toHaveLength(2);
+    // Should not go below 2
+    document.querySelector<HTMLButtonElement>('.btn-remove-slot')!.click();
+    expect(document.querySelectorAll('.player-slot')).toHaveLength(2);
+  });
 });
