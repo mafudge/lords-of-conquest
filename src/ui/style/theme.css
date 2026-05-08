@@ -1,0 +1,19 @@
+:root {
+  --bg: #1f242e;
+  --panel: #2a2f3a;
+  --border: #3d4250;
+  --text: #e4e7ed;
+  --muted: #9ba3b3;
+  --accent: #3a8a4f;
+  --p0: #d4424d;
+  --p1: #4a6cd6;
+  --p2: #4cc1d4;
+  --p3: #9d5bb4;
+  --p4: #d4844a;
+  --p5: #4ab46a;
+  --p6: #d4c14a;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; height: 100%; background: var(--bg); color: var(--text);
+  font-family: -apple-system, BlinkMacSystemFont, system-ui, sans-serif; }
+.boot { padding: 32px; color: var(--muted); }
