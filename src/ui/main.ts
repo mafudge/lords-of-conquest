@@ -1,6 +1,7 @@
 import type { GameState } from '../game/types.js';
 import type { Plan } from '../game/plans.js';
 import { reduce } from '../game/reducer.js';
+import { renderShell } from './render/shell.js';
 
 let state: GameState | null = null;
 let prevState: GameState | null = null;
@@ -34,7 +35,7 @@ export function initApp(opts: { initialState: GameState | null }): void {
   state = opts.initialState;
   const app = document.getElementById('app');
   if (!app) throw new Error('No #app element in DOM');
-  app.innerHTML = '<div class="shell"><div class="shell-loading">Loading…</div></div>';
+  renderShell(app);
 }
 
 if (typeof window !== 'undefined' && document.getElementById('app')) {

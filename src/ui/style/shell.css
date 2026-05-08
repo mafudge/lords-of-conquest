@@ -1,0 +1,12 @@
+.shell { display: grid; grid-template-rows: 52px 1fr 88px; height: 100vh; }
+.shell.expanded-bottom { grid-template-rows: 52px 1fr 160px; }
+.top-bar { display: grid; grid-template-columns: 240px 1fr 200px;
+  align-items: center; padding: 0 16px; background: var(--panel);
+  border-bottom: 1px solid var(--border); }
+.top-bar .top-center { color: var(--muted); text-align: center; }
+.board-host { display: flex; align-items: center; justify-content: center;
+  overflow: hidden; }
+.bottom-bar { display: flex; align-items: center; gap: 12px;
+  padding: 0 16px; background: var(--panel); border-top: 1px solid var(--border); }
+.bottom-bar .pills { display: flex; gap: 8px; flex: 1; }
+.bottom-bar .actions { display: flex; gap: 8px; }
