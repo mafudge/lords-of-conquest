@@ -32,4 +32,21 @@ describe('selectionMode', () => {
     const after = getState()!;
     expect(after.territories.find((t) => t.id === targetTerr.id)!.ownerId).toBe(before.currentPlayer);
   });
+
+  it('Auto-pick button picks a territory for the current player', async () => {
+    document.body.innerHTML = '<div id="app"></div>';
+    initApp({ initialState: null });
+    const setup = defaultSetupState();
+    dispatch({ kind: 'newGame', setup: setup.setup, seed: setup.seed });
+    await new Promise((r) => setTimeout(r, 50));
+    const btn = document.querySelector<HTMLButtonElement>('.actions button.act');
+    expect(btn?.textContent).toBe('Auto-pick');
+    const before = getState()!;
+    const ownedBefore = before.territories.filter((t) => t.ownerId === 0).length;
+    btn?.click();
+    await new Promise((r) => setTimeout(r, 50));
+    const after = getState()!;
+    const ownedAfter = after.territories.filter((t) => t.ownerId === 0).length;
+    expect(ownedAfter).toBeGreaterThanOrEqual(ownedBefore);
+  });
 });

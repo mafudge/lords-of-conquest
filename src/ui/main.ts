@@ -9,6 +9,7 @@ import { mountSetupWizard } from './setup/setupWizard.js';
 import { defaultSetupState } from './setup/state.js';
 import { getMode, setMode } from './interactions/interactionMode.js';
 import { selectionMode } from './interactions/selectionMode.js';
+import { decideSelectionAction } from '../game/ai/selection.js';
 
 let state: GameState | null = null;
 let prevState: GameState | null = null;
@@ -70,6 +71,13 @@ function render(s: GameState, _prev?: GameState): void {
 
 function defaultActionsFor(s: GameState): BarAction[] {
   if (s.currentPhase === 'gameOver') return [];
+  if (s.currentPhase === 'selection') {
+    return [{ label: 'Auto-pick', kind: 'secondary',
+      onClick: () => {
+        const plan = decideSelectionAction(s, s.currentPlayer);
+        dispatch(plan);
+      } }];
+  }
   return [{ label: 'End Phase', kind: 'secondary',
     onClick: () => dispatch({ kind: 'endPhase', player: s.currentPlayer }) }];
 }
