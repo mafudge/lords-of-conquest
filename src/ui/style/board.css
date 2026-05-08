@@ -12,3 +12,9 @@
 .glyph-weapon { fill: none; stroke: #d4c8b0; stroke-width: 2.5; stroke-linecap: round; }
 .glyph-horse { fill: #b8a878; stroke: #1f242e; stroke-width: 1; }
 .glyph-stockpile { fill: #8b7d65; stroke: #1f242e; stroke-width: 1; }
+.boat-sprite .hull { fill: var(--owner-color); stroke: #1f242e; stroke-width: 0.5; }
+.boat-sprite .mast { stroke: #d4c8b0; stroke-width: 1.5; }
+.boat-sprite .embark-horse { fill: #b8a878; }
+.boat-sprite .embark-weapon { stroke: #d4c8b0; stroke-width: 2; }
+.force-badge { fill: white; font-size: 9px; font-weight: 600;
+  paint-order: stroke; stroke: #1f242e; stroke-width: 2; }
