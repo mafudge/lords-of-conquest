@@ -75,3 +75,21 @@ describe('autosave', () => {
     expect(loadAutosave()).toBeNull();
   });
 });
+
+describe('named slots', () => {
+  it('saveSlot/loadSlot roundtrip', async () => {
+    const { saveSlot, loadSlot } = await import('../../../src/ui/platform/persistence.js');
+    const s = fixtureState();
+    saveSlot(1, s);
+    const back = loadSlot(1);
+    expect(back).not.toBeNull();
+    expect(back!.year).toBe(s.year);
+  });
+
+  it('slotSummary returns metadata for filled slots', async () => {
+    const { saveSlot, slotSummary } = await import('../../../src/ui/platform/persistence.js');
+    saveSlot(2, fixtureState());
+    const sums = slotSummary();
+    expect(sums.find((s) => s.slot === 2)?.filled).toBe(true);
+  });
+});

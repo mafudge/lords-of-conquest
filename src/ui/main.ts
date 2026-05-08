@@ -21,6 +21,7 @@ import { openAlliesDialog } from './overlays/alliesDialog.js';
 import { conquestMode } from './interactions/conquestMode.js';
 import { developmentMode } from './interactions/developmentMode.js';
 import { mountKeyboard } from './platform/keyboard.js';
+import { openMenu } from './overlays/menu.js';
 
 let state: GameState | null = null;
 let prevState: GameState | null = null;
@@ -38,6 +39,12 @@ export function dispatch(plan: Plan): void {
   state = reduce(prev, plan);
   if (state) autosave(state);
   scheduleRender();
+}
+
+export function loadStateAndRender(s: GameState): void {
+  prevState = state;
+  state = s;
+  render(state, prevState ?? undefined);
 }
 
 function scheduleRender(): void {
@@ -72,6 +79,17 @@ function render(s: GameState, _prev?: GameState): void {
   if (!app) return;
   renderShell(app);
   renderTopBar(s);
+  const gearBtn = document.querySelector<HTMLButtonElement>('.btn-menu');
+  if (gearBtn && !gearBtn.dataset.bound) {
+    gearBtn.dataset.bound = 'true';
+    gearBtn.addEventListener('click', () => {
+      openMenu({
+        currentState: getState(),
+        onLoad: (s) => loadStateAndRender(s),
+        onNewGame: () => location.reload(),
+      });
+    });
+  }
   renderBoard(s);
   attachBoardClicks(s);
   if (s.pendingTrade && s.pendingTrade.status === 'proposed') {

@@ -46,3 +46,37 @@ export function loadAutosave(): GameState | null {
 export function clearAutosave(): void {
   localStorage.removeItem(KEY_AUTOSAVE);
 }
+
+function slotKey(n: number): string { return `loc:save:slot${n}`; }
+
+export function saveSlot(n: number, state: GameState): void {
+  const payload = {
+    schemaVersion: SCHEMA,
+    savedAt: new Date().toISOString(),
+    state: JSON.parse(serializeState(state)),
+  };
+  localStorage.setItem(slotKey(n), JSON.stringify(payload));
+}
+
+export function loadSlot(n: number): GameState | null {
+  const raw = localStorage.getItem(slotKey(n));
+  if (!raw) return null;
+  try {
+    const payload = JSON.parse(raw);
+    if (payload.schemaVersion !== SCHEMA) return null;
+    return deserializeState(JSON.stringify(payload.state));
+  } catch { return null; }
+}
+
+export function slotSummary(): Array<{ slot: number; filled: boolean; savedAt?: string; year?: number }> {
+  const out: Array<{ slot: number; filled: boolean; savedAt?: string; year?: number }> = [];
+  for (let n = 1; n <= 3; n++) {
+    const raw = localStorage.getItem(slotKey(n));
+    if (!raw) { out.push({ slot: n, filled: false }); continue; }
+    try {
+      const p = JSON.parse(raw);
+      out.push({ slot: n, filled: true, savedAt: p.savedAt, year: p.state?.year });
+    } catch { out.push({ slot: n, filled: false }); }
+  }
+  return out;
+}
