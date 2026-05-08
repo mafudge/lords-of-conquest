@@ -1,4 +1,5 @@
-import { describe, it, expect } from 'vitest';
+// @vitest-environment happy-dom
+import { describe, it, expect, beforeEach } from 'vitest';
 import { serializeState, deserializeState } from '../../../src/ui/platform/persistence.js';
 import type { GameState } from '../../../src/game/types.js';
 
@@ -34,6 +35,10 @@ function fixtureState(): GameState {
   };
 }
 
+beforeEach(() => {
+  localStorage.clear();
+});
+
 describe('serializeState / deserializeState', () => {
   it('round-trips Set fields back to Set instances', () => {
     const s = fixtureState();
@@ -48,5 +53,25 @@ describe('serializeState / deserializeState', () => {
   it('returns valid JSON', () => {
     const s = fixtureState();
     expect(() => JSON.parse(serializeState(s))).not.toThrow();
+  });
+});
+
+describe('autosave', () => {
+  it('writes to localStorage["loc:save:autosave"] after debounce', async () => {
+    const { autosave, loadAutosave } = await import('../../../src/ui/platform/persistence.js');
+    const s = fixtureState();
+    autosave(s);
+    await new Promise((r) => setTimeout(r, 600));
+    const restored = loadAutosave();
+    expect(restored).not.toBeNull();
+    expect(restored!.year).toBe(s.year);
+  });
+
+  it('schemaVersion mismatch refuses to load', async () => {
+    const { loadAutosave } = await import('../../../src/ui/platform/persistence.js');
+    localStorage.setItem('loc:save:autosave', JSON.stringify({
+      schemaVersion: 999, savedAt: new Date().toISOString(), state: fixtureState(),
+    }));
+    expect(loadAutosave()).toBeNull();
   });
 });

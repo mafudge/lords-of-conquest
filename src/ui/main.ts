@@ -1,6 +1,7 @@
 import type { GameState } from '../game/types.js';
 import type { Plan } from '../game/plans.js';
 import { reduce } from '../game/reducer.js';
+import { autosave } from './platform/persistence.js';
 import { startRuntime } from './runtime.js';
 import { renderShell } from './render/shell.js';
 import { renderTopBar } from './render/topBar.js';
@@ -35,6 +36,7 @@ export function dispatch(plan: Plan): void {
   const prev = state ?? ({} as GameState);
   prevState = state;
   state = reduce(prev, plan);
+  if (state) autosave(state);
   scheduleRender();
 }
 
