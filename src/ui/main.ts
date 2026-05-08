@@ -2,6 +2,9 @@ import type { GameState } from '../game/types.js';
 import type { Plan } from '../game/plans.js';
 import { reduce } from '../game/reducer.js';
 import { renderShell } from './render/shell.js';
+import { renderTopBar } from './render/topBar.js';
+import { renderBottomBar, type BarAction } from './render/bottomBar.js';
+import { renderBoard } from './render/board.js';
 import { mountSetupWizard } from './setup/setupWizard.js';
 import { defaultSetupState } from './setup/state.js';
 
@@ -14,9 +17,11 @@ export function getState(): GameState | null {
 }
 
 export function dispatch(plan: Plan): void {
-  if (state === null) throw new Error('dispatch called before initApp');
+  // Allow 'newGame' before state is initialised (state === null means no
+  // prior game; newGame ignores prev entirely).
+  const prev = state ?? ({} as GameState);
   prevState = state;
-  state = reduce(state, plan);
+  state = reduce(prev, plan);
   scheduleRender();
 }
 
@@ -29,14 +34,26 @@ function scheduleRender(): void {
   });
 }
 
-function render(_s: GameState, _p?: GameState): void {
-  // Filled in by Task 4 (shell render).
+function render(s: GameState, _prev?: GameState): void {
+  const app = document.getElementById('app');
+  if (!app) return;
+  renderShell(app);
+  renderTopBar(s);
+  renderBoard(s);
+  renderBottomBar(s, defaultActionsFor(s));
+}
+
+function defaultActionsFor(s: GameState): BarAction[] {
+  if (s.currentPhase === 'gameOver') return [];
+  return [{ label: 'End Phase', kind: 'secondary',
+    onClick: () => dispatch({ kind: 'endPhase', player: s.currentPlayer }) }];
 }
 
 export function initApp(opts: { initialState: GameState | null }): void {
   state = opts.initialState;
   const app = document.getElementById('app');
   if (!app) throw new Error('No #app element in DOM');
+  app.innerHTML = ''; // clear any existing wizard
   renderShell(app);
 }
 
