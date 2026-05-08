@@ -22,6 +22,7 @@ import { conquestMode } from './interactions/conquestMode.js';
 import { developmentMode } from './interactions/developmentMode.js';
 import { mountKeyboard } from './platform/keyboard.js';
 import { openMenu } from './overlays/menu.js';
+import { openGameOver } from './overlays/gameOver.js';
 import { mountDrawer, toggleDrawer, getActiveTab } from './scouting/drawer.js';
 import { setSelectedTerritory, renderForceTab } from './scouting/forceCountTab.js';
 import { renderStockpilesTab } from './scouting/stockpilesTab.js';
@@ -144,6 +145,18 @@ function render(s: GameState, _prev?: GameState): void {
           player: human, choice } as any),
       });
     }
+  }
+  if (s.currentPhase === 'gameOver' && !document.querySelector('.game-over')) {
+    // Determine winner from log or by city count
+    const winnerLog = s.log.slice().reverse().find((l) => /won the game/i.test(l.message));
+    const winnerName = winnerLog?.message.split(' ')[0] ?? 'Someone';
+    const winner = s.players.find((p) => p.name === winnerName);
+    openGameOver({
+      winnerName,
+      winnerColor: winner?.color ?? 'red',
+      year: s.year,
+      onNewGame: () => location.reload(),
+    });
   }
   if (s.currentPhase === 'selection') {
     setMode(selectionMode);
