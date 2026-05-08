@@ -10,6 +10,7 @@ import { mountSetupWizard } from './setup/setupWizard.js';
 import { defaultSetupState } from './setup/state.js';
 import { getMode, setMode } from './interactions/interactionMode.js';
 import { selectionMode } from './interactions/selectionMode.js';
+import { locateStockpileMode } from './interactions/locateStockpileMode.js';
 import { decideSelectionAction } from '../game/ai/selection.js';
 
 let state: GameState | null = null;
@@ -66,6 +67,17 @@ function render(s: GameState, _prev?: GameState): void {
   if (s.currentPhase === 'selection') {
     setMode(selectionMode);
     selectionMode.enter(s);
+  }
+  const me = s.players[s.currentPlayer];
+  const needsLocate = me?.persona === 'human'
+    && me.stockpile.some((c) => c > 0)
+    && me.stockpileLocation === null
+    && (s.currentPhase === 'production' || s.currentPhase === 'trade'
+        || s.currentPhase === 'shipment' || s.currentPhase === 'conquest'
+        || s.currentPhase === 'development');
+  if (needsLocate) {
+    setMode(locateStockpileMode);
+    locateStockpileMode.enter(s);
   }
   renderBottomBar(s, defaultActionsFor(s));
 }

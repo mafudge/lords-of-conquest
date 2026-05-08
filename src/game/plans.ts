@@ -25,6 +25,7 @@ export type Plan =
   | { kind: 'buildCity'; player: PlayerId; territoryId: number; payInGold: boolean }
   | { kind: 'buildWeapon'; player: PlayerId; territoryId: number; payInGold: boolean }
   | { kind: 'buildBoat'; player: PlayerId; territoryId: number; lakeId: number; payInGold: boolean }
+  | { kind: 'locateStockpile'; territoryId: number }
   | { kind: 'endPhase'; player: PlayerId }
   | { kind: 'savegame'; slot: 'autosave' | 'slot1' | 'slot2' | 'slot3' }
   | { kind: 'loadGame'; state: GameState }
