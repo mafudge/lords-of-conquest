@@ -22,6 +22,7 @@ import { conquestMode } from './interactions/conquestMode.js';
 import { developmentMode } from './interactions/developmentMode.js';
 import { mountKeyboard } from './platform/keyboard.js';
 import { openMenu } from './overlays/menu.js';
+import { mountDrawer, toggleDrawer } from './scouting/drawer.js';
 
 let state: GameState | null = null;
 let prevState: GameState | null = null;
@@ -79,6 +80,12 @@ function render(s: GameState, _prev?: GameState): void {
   if (!app) return;
   renderShell(app);
   renderTopBar(s);
+  mountDrawer();
+  const scoutingBtn = document.querySelector<HTMLButtonElement>('.btn-scouting');
+  if (scoutingBtn && !scoutingBtn.dataset.bound) {
+    scoutingBtn.dataset.bound = 'true';
+    scoutingBtn.addEventListener('click', () => toggleDrawer());
+  }
   const gearBtn = document.querySelector<HTMLButtonElement>('.btn-menu');
   if (gearBtn && !gearBtn.dataset.bound) {
     gearBtn.dataset.bound = 'true';

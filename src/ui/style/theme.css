@@ -21,6 +21,7 @@ html, body { margin: 0; padding: 0; height: 100%; background: var(--bg); color: 
 @import url('./shell.css');
 @import url('./board.css');
 @import url('./setup.css');
+@import url('./scouting.css');
 
 .flavor-banner { position: fixed; inset: 0; display: flex;
   align-items: center; justify-content: center; background: rgba(0,0,0,0.7);
