@@ -1,0 +1,27 @@
+.board-svg { width: 100%; height: 100%; max-width: 1280px; max-height: 640px; }
+.board-svg .sq { fill: #2a2f3a; stroke: rgba(255,255,255,0.02); stroke-width: 0.5; }
+.board-svg .sq.water { fill: #1c2740; }
+.board-svg .sq.owned { fill: var(--owner-color); fill-opacity: 0.35; }
+.board-svg .sq.candidate { stroke: white; stroke-width: 2; animation: pulse 1.2s infinite; }
+@keyframes pulse {
+  0%, 100% { stroke-opacity: 1; }
+  50% { stroke-opacity: 0.4; }
+}
+.glyph-layer { pointer-events: none; }
+.glyph-city { fill: #d4c8b0; stroke: #1f242e; stroke-width: 1; }
+.glyph-weapon { fill: none; stroke: #d4c8b0; stroke-width: 2.5; stroke-linecap: round; }
+.glyph-horse { fill: #b8a878; stroke: #1f242e; stroke-width: 1; }
+.glyph-stockpile { fill: #8b7d65; stroke: #1f242e; stroke-width: 1; }
+.boat-sprite .hull { fill: var(--owner-color); stroke: #1f242e; stroke-width: 0.5; }
+.boat-sprite .mast { stroke: #d4c8b0; stroke-width: 1.5; }
+.boat-sprite .embark-horse { fill: #b8a878; }
+.boat-sprite .embark-weapon { stroke: #d4c8b0; stroke-width: 2; }
+.force-badge { fill: white; font-size: 9px; font-weight: 600;
+  paint-order: stroke; stroke: #1f242e; stroke-width: 2; }
+.board-svg .sq.flash { animation: sq-flash 200ms; }
+.board-svg.combat-flash { filter: brightness(1.4); transition: filter 60ms; }
+@keyframes sq-flash {
+  0% { fill-opacity: 0.35; }
+  50% { fill-opacity: 0.95; }
+  100% { fill-opacity: 0.35; }
+}

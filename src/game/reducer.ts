@@ -59,6 +59,13 @@ export function reduce(state: GameState, plan: Plan): GameState {
       return applyBuildWeapon(state, plan.player, plan.territoryId, plan.payInGold);
     case 'buildBoat':
       return applyBuildBoat(state, plan.player, plan.territoryId, plan.lakeId, plan.payInGold);
+    case 'locateStockpile': {
+      const nextState = { ...state };
+      nextState.players = state.players.map((p) =>
+        p.id === state.currentPlayer ? { ...p, stockpileLocation: plan.territoryId } : p,
+      );
+      return nextState;
+    }
     default: {
       // Distinguish between "Plan 3 territory" and "completely unknown"
       const kind = (plan as { kind?: string }).kind;
