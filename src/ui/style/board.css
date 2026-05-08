@@ -1,0 +1,9 @@
+.board-svg { width: 100%; height: 100%; max-width: 1280px; max-height: 640px; }
+.board-svg .sq { fill: #2a2f3a; stroke: rgba(255,255,255,0.02); stroke-width: 0.5; }
+.board-svg .sq.water { fill: #1c2740; }
+.board-svg .sq.owned { fill: var(--owner-color); fill-opacity: 0.35; }
+.board-svg .sq.candidate { stroke: white; stroke-width: 2; animation: pulse 1.2s infinite; }
+@keyframes pulse {
+  0%, 100% { stroke-opacity: 1; }
+  50% { stroke-opacity: 0.4; }
+}

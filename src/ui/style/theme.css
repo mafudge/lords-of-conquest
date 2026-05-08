@@ -19,3 +19,4 @@ html, body { margin: 0; padding: 0; height: 100%; background: var(--bg); color: 
 .boot { padding: 32px; color: var(--muted); }
 
 @import url('./shell.css');
+@import url('./board.css');
