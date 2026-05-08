@@ -8,3 +8,10 @@
   color: var(--muted); padding: 10px 4px; font-size: 11px; cursor: pointer; }
 .scouting-drawer .tab[data-active="true"] { color: var(--text); border-bottom: 2px solid var(--accent); }
 .scouting-drawer .tab-panel { padding: 16px; overflow-y: auto; }
+
+.scouting-drawer .hint { color: var(--muted); font-size: 12px; }
+.force-table { width: 100%; font-size: 12px; border-collapse: collapse; }
+.force-table th { text-align: left; color: var(--muted); font-weight: 500; padding: 4px 6px; }
+.force-table td { padding: 4px 6px; border-top: 1px solid var(--border); }
+.force-table .swatch { display: inline-block; width: 10px; height: 10px;
+  border-radius: 50%; margin-right: 6px; }

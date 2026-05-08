@@ -22,7 +22,8 @@ import { conquestMode } from './interactions/conquestMode.js';
 import { developmentMode } from './interactions/developmentMode.js';
 import { mountKeyboard } from './platform/keyboard.js';
 import { openMenu } from './overlays/menu.js';
-import { mountDrawer, toggleDrawer } from './scouting/drawer.js';
+import { mountDrawer, toggleDrawer, getActiveTab } from './scouting/drawer.js';
+import { setSelectedTerritory, renderForceTab } from './scouting/forceCountTab.js';
 
 let state: GameState | null = null;
 let prevState: GameState | null = null;
@@ -71,6 +72,8 @@ function attachBoardClicks(_state: GameState): void {
     const sqIdx = y * 40 + x;
     const sq = cur.squares[sqIdx];
     if (!sq || sq.territoryId === null) return;
+    setSelectedTerritory(sq.territoryId);
+    if (getActiveTab() === 'force') renderForceTab(cur);
     getMode()?.handleClick(sq.territoryId, cur);
   });
 }
@@ -81,6 +84,7 @@ function render(s: GameState, _prev?: GameState): void {
   renderShell(app);
   renderTopBar(s);
   mountDrawer();
+  renderForceTab(s);
   const scoutingBtn = document.querySelector<HTMLButtonElement>('.btn-scouting');
   if (scoutingBtn && !scoutingBtn.dataset.bound) {
     scoutingBtn.dataset.bound = 'true';
