@@ -1,5 +1,6 @@
 import type { SetupState } from './state.js';
 import type { Persona } from '../../game/types.js';
+import { renderPreview } from './mapPreview.js';
 
 const COLORS = ['red', 'blue', 'cyan', 'purple', 'orange', 'green', 'yellow'] as const;
 
@@ -20,7 +21,20 @@ export function mountSetupWizard(
     return COLORS[0];
   }
 
-  function triggerPreview(): void { /* Task 14 */ }
+  let previewTimer: ReturnType<typeof setTimeout> | null = null;
+  function triggerPreview(): void {
+    if (previewTimer) clearTimeout(previewTimer);
+    previewTimer = setTimeout(() => {
+      const host = root.querySelector<HTMLElement>('.preview-board');
+      if (host) {
+        try {
+          renderPreview(host, state.setup, state.seed);
+        } catch {
+          // Map generation may fail for edge-case parameter combinations; ignore silently.
+        }
+      }
+    }, 200);
+  }
 
   function wireEvents(): void {
     root.querySelector('.btn-add-slot')!.addEventListener('click', () => {
@@ -94,6 +108,11 @@ export function mountSetupWizard(
       inp.addEventListener('change', () => {
         state.setup.map.resourceDensity.level = inp.value as 'veryLow'|'low'|'medium'|'high'; triggerPreview();
       }));
+    root.querySelector<HTMLButtonElement>('.btn-reroll')!.addEventListener('click', () => {
+      state.seed = Math.floor(Math.random() * 0xffffffff) >>> 0;
+      root.querySelector<HTMLElement>('.seed-display')!.textContent = `seed: ${state.seed}`;
+      triggerPreview();
+    });
   }
 
   function renderTemplate(s: SetupState): string {
@@ -175,4 +194,5 @@ export function mountSetupWizard(
   }
 
   rerender();
+  triggerPreview();
 }

@@ -88,4 +88,23 @@ describe('mountSetupWizard', () => {
     document.querySelector<HTMLButtonElement>('.btn-start')!.click();
     expect(captured.setup.citiesToWin).toBe(7);
   });
+
+  it('renders a preview SVG board', async () => {
+    mountSetupWizard(document.getElementById('app')!, {
+      initial: defaultSetupState(), onStart: () => {},
+    });
+    // Preview is async (debounced); wait briefly.
+    await new Promise((r) => setTimeout(r, 250));
+    expect(document.querySelector('.preview-board .board-svg')).not.toBeNull();
+  });
+
+  it('Re-roll seed updates the seed-display', () => {
+    mountSetupWizard(document.getElementById('app')!, {
+      initial: { ...defaultSetupState(), seed: 42 }, onStart: () => {},
+    });
+    const before = document.querySelector('.seed-display')!.textContent;
+    document.querySelector<HTMLButtonElement>('.btn-reroll')!.click();
+    const after = document.querySelector('.seed-display')!.textContent;
+    expect(after).not.toBe(before);
+  });
 });
