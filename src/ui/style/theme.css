@@ -20,3 +20,4 @@ html, body { margin: 0; padding: 0; height: 100%; background: var(--bg); color: 
 
 @import url('./shell.css');
 @import url('./board.css');
+@import url('./setup.css');
