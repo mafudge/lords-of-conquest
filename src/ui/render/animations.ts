@@ -61,18 +61,45 @@ async function animateCombat(_prev: GameState, _next: GameState): Promise<void> 
   }
 }
 
-async function animateBuild(_territoryId: number): Promise<void> {
-  await new Promise((r) => setTimeout(r, 150));
+async function animateBuild(territoryId: number): Promise<void> {
+  const sqs = document.querySelectorAll<SVGElement>(
+    `.board-svg .sq[data-territory-id="${territoryId}"]`);
+  sqs.forEach((s) => s.classList.add('flash'));
+  await new Promise((r) => setTimeout(r, 200));
+  sqs.forEach((s) => s.classList.remove('flash'));
 }
 
-async function animateShipment(_prev: GameState, _next: GameState, _plan: Plan): Promise<void> {
-  await new Promise((r) => setTimeout(r, 150));
+async function animateShipment(_prev: GameState, _next: GameState, plan: Plan): Promise<void> {
+  const targetId = (plan as any).to ?? (plan as any).targetTerritoryId;
+  if (typeof targetId !== 'number') {
+    await new Promise((r) => setTimeout(r, 100));
+    return;
+  }
+  const sqs = document.querySelectorAll<SVGElement>(
+    `.board-svg .sq[data-territory-id="${targetId}"]`);
+  if (sqs.length === 0) {
+    await new Promise((r) => setTimeout(r, 100));
+    return;
+  }
+  sqs.forEach((s) => s.classList.add('flash'));
+  await new Promise((r) => setTimeout(r, 250));
+  sqs.forEach((s) => s.classList.remove('flash'));
 }
 
 async function animateTradeProposal(): Promise<void> {
-  await new Promise((r) => setTimeout(r, 150));
+  const banner = document.querySelector('.status-banner');
+  if (banner) {
+    banner.classList.add('pulse');
+    await new Promise((r) => setTimeout(r, 250));
+    banner.classList.remove('pulse');
+  }
 }
 
-async function animateTradeResponse(_accept: boolean): Promise<void> {
-  await new Promise((r) => setTimeout(r, 150));
+async function animateTradeResponse(accept: boolean): Promise<void> {
+  const banner = document.querySelector('.status-banner');
+  if (banner) {
+    banner.classList.add(accept ? 'pulse-accept' : 'pulse-reject');
+    await new Promise((r) => setTimeout(r, 200));
+    banner.classList.remove('pulse-accept', 'pulse-reject');
+  }
 }
