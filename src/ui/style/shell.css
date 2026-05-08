@@ -17,3 +17,16 @@
 .pill .swatch { width: 12px; height: 12px; border-radius: 50%; display: inline-block; }
 .pill .name { font-weight: 600; }
 .pill .r { color: var(--muted); font-variant-numeric: tabular-nums; }
+.top-left { display: flex; align-items: center; gap: 12px; }
+.year-badge { background: rgba(255,255,255,0.06); padding: 4px 8px; border-radius: 4px;
+  font-weight: 600; font-size: 13px; }
+.phase-label { color: var(--muted); font-size: 13px; }
+.turn-strip { display: flex; gap: 4px; margin-left: 8px; }
+.turn-strip .avatar { width: 14px; height: 14px; border-radius: 50%; display: inline-block; }
+.turn-strip .avatar[data-active="true"] { transform: scale(1.2); box-shadow: 0 0 0 2px white; }
+.top-right { display: flex; gap: 8px; justify-content: flex-end; }
+.btn-scouting, .btn-menu { background: transparent; border: 1px solid var(--border);
+  color: var(--text); padding: 6px 10px; border-radius: 4px; cursor: pointer;
+  font-family: inherit; font-size: 12px; }
+.btn-scouting:hover, .btn-menu:hover { background: rgba(255,255,255,0.04); }
+.status-banner { color: var(--muted); font-size: 13px; }
