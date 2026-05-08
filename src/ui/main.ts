@@ -7,6 +7,8 @@ import { renderBottomBar, type BarAction } from './render/bottomBar.js';
 import { renderBoard } from './render/board.js';
 import { mountSetupWizard } from './setup/setupWizard.js';
 import { defaultSetupState } from './setup/state.js';
+import { getMode, setMode } from './interactions/interactionMode.js';
+import { selectionMode } from './interactions/selectionMode.js';
 
 let state: GameState | null = null;
 let prevState: GameState | null = null;
@@ -34,12 +36,35 @@ function scheduleRender(): void {
   });
 }
 
+function attachBoardClicks(_state: GameState): void {
+  const svg = document.querySelector('.board-svg');
+  if (!svg || svg.hasAttribute('data-clicks-bound')) return;
+  svg.setAttribute('data-clicks-bound', 'true');
+  svg.addEventListener('click', (e) => {
+    const t = e.target as SVGElement;
+    if (!t.classList?.contains('sq')) return;
+    const x = Number(t.getAttribute('data-x'));
+    const y = Number(t.getAttribute('data-y'));
+    const cur = getState();
+    if (!cur) return;
+    const sqIdx = y * 40 + x;
+    const sq = cur.squares[sqIdx];
+    if (!sq || sq.territoryId === null) return;
+    getMode()?.handleClick(sq.territoryId, cur);
+  });
+}
+
 function render(s: GameState, _prev?: GameState): void {
   const app = document.getElementById('app');
   if (!app) return;
   renderShell(app);
   renderTopBar(s);
   renderBoard(s);
+  attachBoardClicks(s);
+  if (s.currentPhase === 'selection') {
+    setMode(selectionMode);
+    selectionMode.enter(s);
+  }
   renderBottomBar(s, defaultActionsFor(s));
 }
 
