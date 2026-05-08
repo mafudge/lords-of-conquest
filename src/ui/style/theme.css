@@ -21,3 +21,11 @@ html, body { margin: 0; padding: 0; height: 100%; background: var(--bg); color: 
 @import url('./shell.css');
 @import url('./board.css');
 @import url('./setup.css');
+
+.flavor-banner { position: fixed; inset: 0; display: flex;
+  align-items: center; justify-content: center; background: rgba(0,0,0,0.7);
+  color: #d4c8b0; font-size: 32px; font-weight: 600; z-index: 2000;
+  animation: flavor-fade 1.5s ease-out; pointer-events: none; }
+@keyframes flavor-fade {
+  0% { opacity: 0; } 15% { opacity: 1; } 85% { opacity: 1; } 100% { opacity: 0; }
+}

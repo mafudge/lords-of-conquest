@@ -1,5 +1,6 @@
 import type { GameState } from '../../game/types.js';
 import type { Plan } from '../../game/plans.js';
+import { showFlavorBanner } from './flavorBanner.js';
 
 let fastForward = false;
 export function setFastForward(v: boolean): void { fastForward = v; }
@@ -36,8 +37,19 @@ async function animateSelection(territoryId: number): Promise<void> {
   els.forEach((el) => el.classList.remove('flash'));
 }
 
-async function animateProduction(_prev: GameState, _next: GameState): Promise<void> {
-  await new Promise((r) => setTimeout(r, 100));
+async function animateProduction(prev: GameState, next: GameState): Promise<void> {
+  // Detect production-skip: year unchanged AND no resource counts changed.
+  const skip = next.year === prev.year
+    && next.players.every((p, i) => {
+      const before = prev.players[i]?.stockpile ?? [0, 0, 0, 0, 0];
+      return p.stockpile.every((c, j) => c === before[j]);
+    });
+  if (skip) {
+    const lastLog = next.log[next.log.length - 1];
+    await showFlavorBanner(lastLog?.message ?? 'A productive year is interrupted…', 1500);
+  } else {
+    await new Promise((r) => setTimeout(r, 200));
+  }
 }
 
 async function animateCombat(_prev: GameState, _next: GameState): Promise<void> {
