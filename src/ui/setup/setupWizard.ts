@@ -1,6 +1,9 @@
 import type { SetupState } from './state.js';
 import type { Persona } from '../../game/types.js';
 import { renderPreview } from './mapPreview.js';
+import { encodeMap, decodeMap } from '../../game/mapTextCodec.js';
+import { openMapTextDialog } from './mapTextDialog.js';
+import { buildPreviewState } from './mapPreview.js';
 
 const COLORS = ['red', 'blue', 'cyan', 'purple', 'orange', 'green', 'yellow'] as const;
 
@@ -112,6 +115,35 @@ export function mountSetupWizard(
       state.seed = Math.floor(Math.random() * 0xffffffff) >>> 0;
       root.querySelector<HTMLElement>('.seed-display')!.textContent = `seed: ${state.seed}`;
       triggerPreview();
+    });
+    root.querySelector<HTMLButtonElement>('.btn-save-map')!.addEventListener('click', () => {
+      try {
+        const preview = buildPreviewState(state.setup, state.seed);
+        openMapTextDialog({
+          mode: 'save', initial: encodeMap(preview.squares),
+          onConfirm: () => {},
+        });
+      } catch (err) {
+        alert(`Cannot generate map: ${(err as Error).message}`);
+      }
+    });
+    root.querySelector<HTMLButtonElement>('.btn-load-map')!.addEventListener('click', () => {
+      openMapTextDialog({
+        mode: 'load', initial: '',
+        onConfirm: (text) => {
+          try {
+            const decoded = decodeMap(text);
+            if (decoded.kind === 'error') {
+              alert(`Map text invalid: ${decoded.message}`);
+              return;
+            }
+            state.setup.map.numTerritories = decoded.numTerritories as any;
+            triggerPreview();
+          } catch (err) {
+            alert(`Map text invalid: ${(err as Error).message}`);
+          }
+        },
+      });
     });
   }
 

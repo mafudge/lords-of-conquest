@@ -2,6 +2,8 @@ import type { GameState } from '../game/types.js';
 import type { Plan } from '../game/plans.js';
 import { reduce } from '../game/reducer.js';
 import { renderShell } from './render/shell.js';
+import { mountSetupWizard } from './setup/setupWizard.js';
+import { defaultSetupState } from './setup/state.js';
 
 let state: GameState | null = null;
 let prevState: GameState | null = null;
@@ -39,5 +41,21 @@ export function initApp(opts: { initialState: GameState | null }): void {
 }
 
 if (typeof window !== 'undefined' && document.getElementById('app')) {
-  initApp({ initialState: null });
+  const initial = defaultSetupState();
+  // URL seed override
+  try {
+    const m = window.location.search.match(/[?&]seed=([^&]+)/);
+    if (m) {
+      const parsed = parseInt(m[1]!, 10);
+      if (!isNaN(parsed)) initial.seed = parsed;
+    }
+  } catch {}
+  mountSetupWizard(document.getElementById('app')!, {
+    initial,
+    onStart: (s) => {
+      // Replace setup wizard with shell + dispatch newGame
+      initApp({ initialState: null });
+      dispatch({ kind: 'newGame', setup: s.setup, seed: s.seed });
+    },
+  });
 }

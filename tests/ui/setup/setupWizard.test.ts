@@ -107,4 +107,21 @@ describe('mountSetupWizard', () => {
     const after = document.querySelector('.seed-display')!.textContent;
     expect(after).not.toBe(before);
   });
+
+  it('clicking Save Map opens a dialog with the encoded map text', () => {
+    mountSetupWizard(document.getElementById('app')!, {
+      initial: defaultSetupState(), onStart: () => {},
+    });
+    document.querySelector<HTMLButtonElement>('.btn-save-map')!.click();
+    expect(document.querySelector('.map-text-dialog')).not.toBeNull();
+    expect(document.querySelector<HTMLTextAreaElement>('.map-text-dialog textarea')!.value.length).toBeGreaterThan(0);
+  });
+
+  it('Load Map dialog opens an empty textarea', () => {
+    mountSetupWizard(document.getElementById('app')!, {
+      initial: defaultSetupState(), onStart: () => {},
+    });
+    document.querySelector<HTMLButtonElement>('.btn-load-map')!.click();
+    expect(document.querySelector<HTMLTextAreaElement>('.map-text-dialog textarea')!.value).toBe('');
+  });
 });
