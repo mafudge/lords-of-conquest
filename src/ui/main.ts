@@ -24,6 +24,9 @@ import { mountKeyboard } from './platform/keyboard.js';
 import { openMenu } from './overlays/menu.js';
 import { mountDrawer, toggleDrawer, getActiveTab } from './scouting/drawer.js';
 import { setSelectedTerritory, renderForceTab } from './scouting/forceCountTab.js';
+import { renderStockpilesTab } from './scouting/stockpilesTab.js';
+import { renderSaveMapTab } from './scouting/saveMapTab.js';
+import { setSelectedBoat, renderBoatInfoTab } from './scouting/boatInfoTab.js';
 
 let state: GameState | null = null;
 let prevState: GameState | null = null;
@@ -63,6 +66,12 @@ function attachBoardClicks(_state: GameState): void {
   if (!svg || svg.hasAttribute('data-clicks-bound')) return;
   svg.setAttribute('data-clicks-bound', 'true');
   svg.addEventListener('click', (e) => {
+    const boatEl = (e.target as Element).closest<SVGGElement>('.boat-sprite');
+    if (boatEl) {
+      setSelectedBoat(Number(boatEl.dataset.boatId));
+      renderBoatInfoTab(getState()!);
+      return;
+    }
     const t = e.target as SVGElement;
     if (!t.classList?.contains('sq')) return;
     const x = Number(t.getAttribute('data-x'));
@@ -85,6 +94,9 @@ function render(s: GameState, _prev?: GameState): void {
   renderTopBar(s);
   mountDrawer();
   renderForceTab(s);
+  renderStockpilesTab(s);
+  renderSaveMapTab(s);
+  renderBoatInfoTab(s);
   const scoutingBtn = document.querySelector<HTMLButtonElement>('.btn-scouting');
   if (scoutingBtn && !scoutingBtn.dataset.bound) {
     scoutingBtn.dataset.bound = 'true';
