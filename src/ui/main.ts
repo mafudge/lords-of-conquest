@@ -14,6 +14,7 @@ import { locateStockpileMode } from './interactions/locateStockpileMode.js';
 import { decideSelectionAction } from '../game/ai/selection.js';
 import { openTradeePicker } from './overlays/tradeePicker.js';
 import { openTradeBuilder } from './overlays/tradeBuilder.js';
+import { openTradeResponse } from './overlays/tradeResponse.js';
 
 let state: GameState | null = null;
 let prevState: GameState | null = null;
@@ -66,6 +67,19 @@ function render(s: GameState, _prev?: GameState): void {
   renderTopBar(s);
   renderBoard(s);
   attachBoardClicks(s);
+  if (s.pendingTrade && s.pendingTrade.status === 'proposed') {
+    const tradee = s.players[s.pendingTrade.tradeeId];
+    if (tradee?.persona === 'human' && !document.querySelector('.trade-response')) {
+      const proposer = s.players[s.pendingTrade.proposerId];
+      openTradeResponse({
+        proposerName: proposer?.name ?? '?',
+        give: s.pendingTrade.give, receive: s.pendingTrade.receive,
+        onAccept: () => dispatch({ kind: 'tradeResponse', accept: true }),
+        onReject: () => dispatch({ kind: 'tradeResponse', accept: false }),
+        onRejectAll: () => dispatch({ kind: 'tradeRejectAll', tradee: s.pendingTrade!.tradeeId, trader: s.pendingTrade!.proposerId } as any),
+      });
+    }
+  }
   if (s.currentPhase === 'selection') {
     setMode(selectionMode);
     selectionMode.enter(s);
