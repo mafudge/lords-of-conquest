@@ -1,6 +1,7 @@
 import type { GameState } from '../game/types.js';
 import type { Plan } from '../game/plans.js';
 import { reduce } from '../game/reducer.js';
+import { startRuntime } from './runtime.js';
 import { renderShell } from './render/shell.js';
 import { renderTopBar } from './render/topBar.js';
 import { renderBottomBar, type BarAction } from './render/bottomBar.js';
@@ -106,6 +107,7 @@ if (typeof window !== 'undefined' && document.getElementById('app')) {
       // Replace setup wizard with shell + dispatch newGame
       initApp({ initialState: null });
       dispatch({ kind: 'newGame', setup: s.setup, seed: s.seed });
+      startRuntime();
     },
   });
 }
