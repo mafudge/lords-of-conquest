@@ -18,3 +18,10 @@
 .boat-sprite .embark-weapon { stroke: #d4c8b0; stroke-width: 2; }
 .force-badge { fill: white; font-size: 9px; font-weight: 600;
   paint-order: stroke; stroke: #1f242e; stroke-width: 2; }
+.board-svg .sq.flash { animation: sq-flash 200ms; }
+.board-svg.combat-flash { filter: brightness(1.4); transition: filter 60ms; }
+@keyframes sq-flash {
+  0% { fill-opacity: 0.35; }
+  50% { fill-opacity: 0.95; }
+  100% { fill-opacity: 0.35; }
+}

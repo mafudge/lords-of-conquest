@@ -33,8 +33,9 @@ export function renderBoard(state: GameState): void {
       ? PLAYER_VAR[state.players[ownerId]!.color] ?? '--p0'
       : null;
     const fillStyle = colorVar ? ` style="--owner-color: var(${colorVar})"` : '';
+    const territoryAttr = sq.territoryId !== null ? ` data-territory-id="${sq.territoryId}"` : '';
     sqElems.push(
-      `<rect class="${cls}" data-x="${sq.x}" data-y="${sq.y}" ` +
+      `<rect class="${cls}" data-x="${sq.x}" data-y="${sq.y}"${territoryAttr} ` +
       `x="${x}" y="${y}" width="${cellSize}" height="${cellSize}"${fillStyle}></rect>`,
     );
   }

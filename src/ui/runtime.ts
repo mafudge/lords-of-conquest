@@ -2,6 +2,8 @@ import { decideAction } from '../game/ai/index.js';
 import { decideTradeAction } from '../game/ai/trade.js';
 import { decideAlliesAction } from '../game/ai/conquest.js';
 import { getState, dispatch } from './main.js';
+import type { Plan } from '../game/plans.js';
+import { animatePlan } from './render/animations.js';
 
 let running = false;
 let scheduled = false;
@@ -18,11 +20,11 @@ export function stopRuntime(): void {
 function schedule(): void {
   if (scheduled || !running) return;
   scheduled = true;
-  queueMicrotask(() => {
+  queueMicrotask(async () => {
     scheduled = false;
     if (!running) return;
     try {
-      tickOnce();
+      await tickOnce();
     } catch (_e) {
       // A dispatcher or AI decision error stops the runtime to prevent infinite loops.
       running = false;
@@ -32,7 +34,15 @@ function schedule(): void {
   });
 }
 
-export function tickOnce(): void {
+async function dispatchAnimated(plan: Plan): Promise<void> {
+  const prev = getState();
+  if (!prev) { dispatch(plan); return; }
+  dispatch(plan);
+  const next = getState();
+  if (next) await animatePlan(prev, next, plan);
+}
+
+export async function tickOnce(): Promise<void> {
   const s = getState();
   if (!s) return;
   if (s.currentPhase === 'gameOver') return;
@@ -42,7 +52,7 @@ export function tickOnce(): void {
     const tradee = s.players[s.pendingTrade.tradeeId];
     if (tradee && tradee.persona !== 'human') {
       const accept = decideTradeAction(s, s.pendingTrade.tradeeId, s.pendingTrade);
-      dispatch({ kind: 'tradeResponse', accept });
+      await dispatchAnimated({ kind: 'tradeResponse', accept });
       return;
     }
     return; // waiting on human
@@ -54,18 +64,18 @@ export function tickOnce(): void {
       .find((p) => s.players[p]!.persona !== 'human');
     if (pendingNonHuman !== undefined) {
       const choice = decideAlliesAction(s, pendingNonHuman, s.pendingCombat);
-      dispatch({ kind: 'alliesDecision', player: pendingNonHuman, choice });
+      await dispatchAnimated({ kind: 'alliesDecision', player: pendingNonHuman, choice });
       return;
     }
     if (s.pendingCombat.alliesPending.size === 0) {
-      dispatch({ kind: 'resolveCombat' });
+      await dispatchAnimated({ kind: 'resolveCombat' });
       return;
     }
     return; // waiting on human ally
   }
 
   if (s.pendingCombat && s.pendingCombat.resolved) {
-    dispatch({ kind: 'endPhase', player: s.currentPlayer });
+    await dispatchAnimated({ kind: 'endPhase', player: s.currentPlayer });
     return;
   }
 
@@ -73,7 +83,7 @@ export function tickOnce(): void {
   if (s.currentPhase === 'selection') {
     const unowned = s.territories.filter((t) => t.ownerId === null);
     if (unowned.length === 0) {
-      dispatch({ kind: 'endPhase', player: s.currentPlayer });
+      await dispatchAnimated({ kind: 'endPhase', player: s.currentPlayer });
       return;
     }
   }
@@ -83,15 +93,15 @@ export function tickOnce(): void {
   if (!cur || cur.persona === 'human') return;
 
   if (s.currentPhase === 'production') {
-    dispatch({ kind: 'production' });
+    await dispatchAnimated({ kind: 'production' });
     // After applying, advance phase if still production.
     const after = getState()!;
     if (after.currentPhase === 'production') {
-      dispatch({ kind: 'endPhase', player: after.currentPlayer });
+      await dispatchAnimated({ kind: 'endPhase', player: after.currentPlayer });
     }
     return;
   }
 
   const plan = decideAction(s, s.currentPlayer);
-  dispatch(plan);
+  await dispatchAnimated(plan);
 }
