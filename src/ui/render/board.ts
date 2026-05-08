@@ -1,4 +1,5 @@
 import type { GameState } from '../../game/types.js';
+import { renderTileGlyphs } from './tile.js';
 
 const PLAYER_VAR: Record<string, string> = {
   red: '--p0', blue: '--p1', cyan: '--p2', purple: '--p3',
@@ -37,4 +38,5 @@ export function renderBoard(state: GameState): void {
     );
   }
   svg.innerHTML = sqElems.join('');
+  renderTileGlyphs(state);
 }
