@@ -20,6 +20,8 @@ export function mountSetupWizard(
     return COLORS[0];
   }
 
+  function triggerPreview(): void { /* Task 14 */ }
+
   function wireEvents(): void {
     root.querySelector('.btn-add-slot')!.addEventListener('click', () => {
       if (state.setup.players.length >= 7) return;
@@ -51,6 +53,47 @@ export function mountSetupWizard(
       });
     });
     root.querySelector('.btn-start')!.addEventListener('click', () => opts.onStart(state));
+
+    root.querySelector<HTMLInputElement>('input[name="cities-to-win"]')!.addEventListener('change', (e) => {
+      state.setup.citiesToWin = Number((e.target as HTMLInputElement).value) as 3|4|5|6|7|8;
+    });
+    root.querySelectorAll<HTMLInputElement>('input[name="eoc"]').forEach((inp) => {
+      inp.addEventListener('change', () => {
+        state.setup.elementOfChance = inp.value as 'low'|'medium'|'high';
+      });
+    });
+    root.querySelector<HTMLInputElement>('input[name="randomize-order"]')!.addEventListener('change', (e) => {
+      state.setup.randomizePlayerOrder = (e.target as HTMLInputElement).checked;
+    });
+    root.querySelector<HTMLInputElement>('input[name="water-boundary"]')!.addEventListener('change', (e) => {
+      state.setup.map.waterBoundary = (e.target as HTMLInputElement).checked;
+      triggerPreview();
+    });
+    root.querySelectorAll<HTMLInputElement>('input[name="water-area"]').forEach((inp) =>
+      inp.addEventListener('change', () => {
+        state.setup.map.waterArea = inp.value as 'small'|'medium'|'large'; triggerPreview();
+      }));
+    root.querySelector<HTMLSelectElement>('select[name="num-territories"]')!.addEventListener('change', (e) => {
+      state.setup.map.numTerritories = Number((e.target as HTMLSelectElement).value);
+      triggerPreview();
+    });
+    root.querySelectorAll<HTMLInputElement>('input[name="islands"]').forEach((inp) =>
+      inp.addEventListener('change', () => {
+        state.setup.map.islands = inp.value as 'none'|'some'|'lots'; triggerPreview();
+      }));
+    root.querySelectorAll<HTMLInputElement>('input[name="shapes"]').forEach((inp) =>
+      inp.addEventListener('change', () => {
+        state.setup.map.shapes = inp.value as 'regular'|'irregular'; triggerPreview();
+      }));
+    root.querySelectorAll<HTMLInputElement>('input[name="res-mode"]').forEach((inp) =>
+      inp.addEventListener('change', () => {
+        state.setup.map.resourceDensity.kind = inp.value as 'fixed'|'random';
+        triggerPreview();
+      }));
+    root.querySelectorAll<HTMLInputElement>('input[name="res-density"]').forEach((inp) =>
+      inp.addEventListener('change', () => {
+        state.setup.map.resourceDensity.level = inp.value as 'veryLow'|'low'|'medium'|'high'; triggerPreview();
+      }));
   }
 
   function renderTemplate(s: SetupState): string {
@@ -76,9 +119,44 @@ export function mountSetupWizard(
             <div class="players-list">${slots}</div>
             <button class="btn-add-slot"${s.setup.players.length >= 7 ? ' disabled' : ''}>+ Add player</button>
           </section>
-          <section class="rules-section"><h2>Rules</h2><div class="rules-grid"></div></section>
-          <section class="map-section"><h2>Map options</h2><div class="map-grid"></div></section>
-          <section class="resources-section"><h2>Resources</h2><div class="resources-grid"></div></section>
+          <section class="rules-section"><h2>Rules</h2><div class="rules-grid">
+            <label>Cities to win <input name="cities-to-win" type="number" min="3" max="8" value="${s.setup.citiesToWin}" /></label>
+            <label>Element of Chance:
+              <input type="radio" name="eoc" value="low"${s.setup.elementOfChance === 'low' ? ' checked' : ''} /> Low
+              <input type="radio" name="eoc" value="medium"${s.setup.elementOfChance === 'medium' ? ' checked' : ''} /> Med
+              <input type="radio" name="eoc" value="high"${s.setup.elementOfChance === 'high' ? ' checked' : ''} /> High
+            </label>
+            <label><input type="checkbox" name="randomize-order"${s.setup.randomizePlayerOrder ? ' checked' : ''} /> Randomize player order</label>
+          </div></section>
+          <section class="map-section"><h2>Map options</h2><div class="map-grid">
+            <label><input type="checkbox" name="water-boundary"${s.setup.map.waterBoundary ? ' checked' : ''} /> Water boundary</label>
+            <label>Water area:
+              ${(['small', 'medium', 'large'] as const).map((v) =>
+                `<input type="radio" name="water-area" value="${v}"${s.setup.map.waterArea === v ? ' checked' : ''} /> ${v}`).join(' ')}
+            </label>
+            <label>Territories <select name="num-territories">
+              ${[8,12,16,20,24,32,40,48,56,64].map((n) =>
+                `<option value="${n}"${s.setup.map.numTerritories === n ? ' selected' : ''}>${n}</option>`).join('')}
+            </select></label>
+            <label>Islands:
+              ${(['none','some','lots'] as const).map((v) =>
+                `<input type="radio" name="islands" value="${v}"${s.setup.map.islands === v ? ' checked' : ''} /> ${v}`).join(' ')}
+            </label>
+            <label>Shapes:
+              ${(['regular','irregular'] as const).map((v) =>
+                `<input type="radio" name="shapes" value="${v}"${s.setup.map.shapes === v ? ' checked' : ''} /> ${v}`).join(' ')}
+            </label>
+          </div></section>
+          <section class="resources-section"><h2>Resources</h2><div class="resources-grid">
+            <label>Mode:
+              <input type="radio" name="res-mode" value="fixed"${s.setup.map.resourceDensity.kind === 'fixed' ? ' checked' : ''} /> Fixed
+              <input type="radio" name="res-mode" value="random"${s.setup.map.resourceDensity.kind === 'random' ? ' checked' : ''} /> Random
+            </label>
+            <label>Density:
+              ${(['veryLow','low','medium','high'] as const).map((v) =>
+                `<input type="radio" name="res-density" value="${v}"${s.setup.map.resourceDensity.level === v ? ' checked' : ''} /> ${v.replace('veryLow','very low')}`).join(' ')}
+            </label>
+          </div></section>
           <section class="map-text-section"><h2>Map text</h2><button class="btn-save-map">Save current map</button><button class="btn-load-map">Load map text</button></section>
           <footer class="setup-footer">
             <button class="btn-reset">Reset to defaults</button>

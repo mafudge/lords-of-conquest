@@ -57,4 +57,35 @@ describe('mountSetupWizard', () => {
     document.querySelector<HTMLButtonElement>('.btn-remove-slot')!.click();
     expect(document.querySelectorAll('.player-slot')).toHaveLength(2);
   });
+
+  it('renders the cities-to-win stepper, EoC radio, randomize toggle', () => {
+    mountSetupWizard(document.getElementById('app')!, {
+      initial: defaultSetupState(), onStart: () => {},
+    });
+    expect(document.querySelector('input[name="cities-to-win"]')).not.toBeNull();
+    expect(document.querySelectorAll('input[name="eoc"]')).toHaveLength(3);
+    expect(document.querySelector('input[name="randomize-order"]')).not.toBeNull();
+  });
+
+  it('renders the map options (water/territories/islands/shapes)', () => {
+    mountSetupWizard(document.getElementById('app')!, {
+      initial: defaultSetupState(), onStart: () => {},
+    });
+    expect(document.querySelector('input[name="water-boundary"]')).not.toBeNull();
+    expect(document.querySelectorAll('input[name="water-area"]')).toHaveLength(3);
+    expect(document.querySelector('select[name="num-territories"]')).not.toBeNull();
+  });
+
+  it('changing cities-to-win updates state', () => {
+    let captured: any = null;
+    mountSetupWizard(document.getElementById('app')!, {
+      initial: defaultSetupState(),
+      onStart: (s) => { captured = s; },
+    });
+    const inp = document.querySelector<HTMLInputElement>('input[name="cities-to-win"]')!;
+    inp.value = '7';
+    inp.dispatchEvent(new Event('change'));
+    document.querySelector<HTMLButtonElement>('.btn-start')!.click();
+    expect(captured.setup.citiesToWin).toBe(7);
+  });
 });
