@@ -19,6 +19,7 @@ import { openTradeResponse } from './overlays/tradeResponse.js';
 import { openAlliesDialog } from './overlays/alliesDialog.js';
 import { conquestMode } from './interactions/conquestMode.js';
 import { developmentMode } from './interactions/developmentMode.js';
+import { mountKeyboard } from './platform/keyboard.js';
 
 let state: GameState | null = null;
 let prevState: GameState | null = null;
@@ -226,4 +227,6 @@ if (typeof window !== 'undefined' && document.getElementById('app')) {
       startRuntime();
     },
   });
+
+  if (typeof window !== 'undefined') mountKeyboard();
 }
