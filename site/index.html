@@ -1,0 +1,187 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Lords of Conquest Implementations</title>
+  <style>
+    :root {
+      --bg0: #0b1220;
+      --bg1: #10192d;
+      --panel: #16213b;
+      --ink: #e8eefc;
+      --muted: #9fb0d6;
+      --accent: #f4b942;
+      --line: #27365c;
+      --ok: #50d890;
+    }
+    * { box-sizing: border-box; }
+    html, body {
+      margin: 0;
+      min-height: 100%;
+      color: var(--ink);
+      font-family: "Trebuchet MS", "Segoe UI", Tahoma, sans-serif;
+      background:
+        radial-gradient(900px 400px at 10% -10%, #1a2e5f, transparent 60%),
+        radial-gradient(700px 300px at 100% 0%, #3b1f54, transparent 60%),
+        linear-gradient(180deg, var(--bg0), var(--bg1));
+    }
+    .wrap {
+      max-width: 980px;
+      margin: 0 auto;
+      padding: 48px 20px 72px;
+    }
+    .eyebrow {
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      font-size: 12px;
+      color: var(--accent);
+      margin: 0 0 10px;
+    }
+    h1 {
+      margin: 0;
+      font-size: clamp(30px, 6vw, 52px);
+      line-height: 1.05;
+    }
+    .intro {
+      margin-top: 16px;
+      color: var(--muted);
+      max-width: 70ch;
+      line-height: 1.6;
+      font-size: 17px;
+    }
+    .grid {
+      margin-top: 34px;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 16px;
+    }
+    .card {
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02));
+      box-shadow: 0 8px 26px rgba(0,0,0,0.25);
+      padding: 18px;
+    }
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 4px 10px;
+      font-size: 12px;
+      color: var(--muted);
+      margin-bottom: 12px;
+      background: rgba(255,255,255,0.02);
+    }
+    .badge.ok {
+      color: #dffceb;
+      border-color: rgba(80,216,144,0.4);
+      background: rgba(80,216,144,0.12);
+    }
+    .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: currentColor;
+    }
+    .name {
+      margin: 0;
+      font-size: 22px;
+    }
+    .desc {
+      margin-top: 10px;
+      color: var(--muted);
+      line-height: 1.5;
+      min-height: 68px;
+    }
+    .actions {
+      margin-top: 16px;
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .btn {
+      display: inline-block;
+      border-radius: 10px;
+      border: 1px solid var(--line);
+      padding: 10px 14px;
+      text-decoration: none;
+      color: var(--ink);
+      background: #1d2c52;
+      transition: transform 120ms ease, background 120ms ease;
+      font-weight: 600;
+      font-size: 14px;
+    }
+    .btn:hover {
+      transform: translateY(-1px);
+      background: #254079;
+    }
+    .btn.disabled {
+      pointer-events: none;
+      opacity: 0.5;
+      background: #1b2132;
+    }
+    .notes {
+      margin-top: 24px;
+      border-left: 3px solid var(--accent);
+      padding: 12px 14px;
+      color: #f9e4b5;
+      background: rgba(244, 185, 66, 0.08);
+      border-radius: 4px;
+      line-height: 1.5;
+    }
+  </style>
+</head>
+<body>
+  <main class="wrap">
+    <p class="eyebrow">Lords of Conquest</p>
+    <h1>Implementation Hub</h1>
+    <p class="intro">
+      This project hosts multiple Lords of Conquest implementations in one repository.
+      Use the links below to launch playable versions and track ports that are still in development.
+    </p>
+
+    <section class="grid" aria-label="Game implementations">
+      <article class="card">
+        <p class="badge ok"><span class="dot"></span>Available now</p>
+        <h2 class="name">rgettman-cheerpj</h2>
+        <p class="desc">
+          The original Randy Gettman Java applet running in modern browsers via CheerpJ.
+        </p>
+        <div class="actions">
+          <a class="btn" href="./rgettman-cheerpj/">Play this version</a>
+        </div>
+      </article>
+
+      <article class="card">
+        <p class="badge"><span class="dot"></span>In progress</p>
+        <h2 class="name">typescript-js</h2>
+        <p class="desc">
+          Clean-room TypeScript and JavaScript port with active engine and UI development.
+        </p>
+        <div class="actions">
+          <a class="btn disabled" href="#" aria-disabled="true">Web build coming soon</a>
+        </div>
+      </article>
+
+      <article class="card">
+        <p class="badge"><span class="dot"></span>Planned</p>
+        <h2 class="name">flutter / unity</h2>
+        <p class="desc">
+          Future ports will appear here as additional implementation folders are created.
+        </p>
+        <div class="actions">
+          <a class="btn disabled" href="#" aria-disabled="true">Not yet available</a>
+        </div>
+      </article>
+    </section>
+
+    <p class="notes">
+      Current playable web deployment: rgettman-cheerpj.
+      Additional links will be enabled as each implementation gets a browser-ready build.
+    </p>
+  </main>
+</body>
+</html>

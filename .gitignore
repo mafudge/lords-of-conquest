@@ -4,6 +4,7 @@ node_modules/
 # Build artifacts and caches
 dist/
 build/
+_site/
 .vite/
 coverage/
 .nyc_output/
