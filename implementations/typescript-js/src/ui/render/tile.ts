@@ -1,4 +1,5 @@
 import type { GameState, Territory } from '../../game/types.js';
+import { Code } from '../../game/codes.js';
 
 const CELL_SIZE = 32;
 
@@ -6,6 +7,14 @@ export function getCentroidSquare(t: Territory): number {
   // Centroid by average position; fall back to middle index.
   return t.squares[Math.floor(t.squares.length / 2)] ?? t.squares[0]!;
 }
+
+const RESOURCE_GLYPH: Record<number, 'iron' | 'coal' | 'tree' | 'gold' | 'stable'> = {
+  [Code.IRON]: 'iron',
+  [Code.COAL]: 'coal',
+  [Code.TREE]: 'tree',
+  [Code.GOLD]: 'gold',
+  [Code.STABLE]: 'stable',
+};
 
 export function renderTileGlyphs(state: GameState): void {
   const svg = document.querySelector<SVGSVGElement>('.board-svg');
@@ -18,18 +27,39 @@ export function renderTileGlyphs(state: GameState): void {
   svg.appendChild(layer);
 
   for (const t of state.territories) {
-    if (t.ownerId === null) continue;
     const c = getCentroidSquare(t);
     const sq = state.squares[c];
     if (!sq) continue;
     const cx = sq.x * CELL_SIZE + CELL_SIZE / 2;
     const cy = sq.y * CELL_SIZE + CELL_SIZE / 2;
 
+    // Natural resource glyph (visible regardless of ownership).
+    if (t.resource !== null) {
+      const kind = RESOURCE_GLYPH[t.resource];
+      if (kind) layer.appendChild(makeResourceGlyph(kind, cx, cy));
+    }
+
+    // Built items (only after ownership and development).
+    if (t.ownerId === null) continue;
     if (t.hasCity) layer.appendChild(makeGlyph('city', cx, cy));
     if (t.hasWeapon) layer.appendChild(makeGlyph('weapon', cx, cy));
     if (t.hasHorse) layer.appendChild(makeGlyph('horse', cx, cy));
     if (t.hasStockpile) layer.appendChild(makeGlyph('stockpile', cx, cy));
   }
+}
+
+function makeResourceGlyph(kind: 'iron' | 'coal' | 'tree' | 'gold' | 'stable', cx: number, cy: number): SVGElement {
+  const ns = 'http://www.w3.org/2000/svg';
+  const g = document.createElementNS(ns, 'g');
+  g.classList.add(`res-${kind}`);
+  g.setAttribute('transform', `translate(${cx} ${cy})`);
+  const text = document.createElementNS(ns, 'text');
+  text.setAttribute('text-anchor', 'middle');
+  text.setAttribute('dominant-baseline', 'central');
+  text.setAttribute('class', 'res-letter');
+  text.textContent = kind === 'stable' ? 'S' : kind[0]!.toUpperCase();
+  g.appendChild(text);
+  return g as unknown as SVGElement;
 }
 
 function makeGlyph(kind: 'city' | 'weapon' | 'horse' | 'stockpile', cx: number, cy: number): SVGElement {

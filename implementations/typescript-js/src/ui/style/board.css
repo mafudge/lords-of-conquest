@@ -12,6 +12,13 @@
 .glyph-weapon { fill: none; stroke: #d4c8b0; stroke-width: 2.5; stroke-linecap: round; }
 .glyph-horse { fill: #b8a878; stroke: #1f242e; stroke-width: 1; }
 .glyph-stockpile { fill: #8b7d65; stroke: #1f242e; stroke-width: 1; }
+.res-letter { font-size: 16px; font-weight: 700; paint-order: stroke;
+  stroke: #1f242e; stroke-width: 3; stroke-linejoin: round; }
+.res-iron .res-letter { fill: #c0c0c8; }
+.res-coal .res-letter { fill: #4a4a4a; stroke: #d4c8b0; stroke-width: 2; }
+.res-tree .res-letter { fill: #6ab46a; }
+.res-gold .res-letter { fill: #d4c14a; }
+.res-stable .res-letter { fill: #b8a878; }
 .boat-sprite .hull { fill: var(--owner-color); stroke: #1f242e; stroke-width: 0.5; }
 .boat-sprite .mast { stroke: #d4c8b0; stroke-width: 1.5; }
 .boat-sprite .embark-horse { fill: #b8a878; }

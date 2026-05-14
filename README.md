@@ -1,27 +1,52 @@
-# Lords of Conquest — Web Port
+# Lords of Conquest Implementations
 
-A modern, browser-based port of Randy Gettman's 2003 Java applet imitation of the 1986 Electronic Arts strategy game.
+This repository is organized as a collection of Lords of Conquest (LOC) implementations.
 
-## Status
+## Implementations
 
-Two artifacts live in this repo:
+- `implementations/rgettman-cheerpj/`
+	- Randy Gettman Java applet build (`loc.jar`) with a CheerpJ web embed (`index.html`).
+	- Credits to Randy Gettman for the Java implementation.
+	- Folder guide: `implementations/rgettman-cheerpj/README.md`
 
-- **CheerpJ embed** — `index.html` + `loc.jar`. Open `http://localhost:8000/` (after `python3 -m http.server 8000`) to play the original applet running in WebAssembly. Credits to Randy Gettman.
-- **TypeScript port** — in progress under `src/`. Currently shipping: map generation. See `docs/superpowers/specs/2026-05-06-clean-room-port-design.md` for the full design and `docs/superpowers/plans/` for active implementation plans.
+- `implementations/typescript-js/`
+	- The TypeScript/JavaScript clean-room LOC port.
+	- Source code: `src/`
+	- Tests: `tests/`, `tests-e2e/`
+	- Design/docs: `docs/superpowers/specs/`, `docs/superpowers/plans/`
+	- Folder guide: `implementations/typescript-js/README.md`
 
-## Development
+Future implementations (for example Flutter and Unity) should be added as sibling folders under `implementations/`.
+
+## Running Each Implementation
+
+### rgettman-cheerpj
+
+From the repo root:
 
 ```bash
+cd implementations/rgettman-cheerpj
+python3 -m http.server 8000
+```
+
+Then open `http://localhost:8000/`.
+
+### typescript-js
+
+From the repo root:
+
+```bash
+cd implementations/typescript-js
 npm install
-npm test                # vitest
-npm run typecheck       # tsc --noEmit
-npm run gen-map -- --seed 12345    # CLI map generator
+npm test
+npm run typecheck
+npm run gen-map -- --seed 12345
 ```
 
-### Map CLI
+Map CLI examples:
 
-```
+```bash
 npm run gen-map -- --help
 npm run gen-map -- --seed 42 --players 4 --territories 30 --islands some --shapes irregular
-npm run gen-map -- --seed 42 --format text     # Gettman text encoding
+npm run gen-map -- --seed 42 --format text
 ```

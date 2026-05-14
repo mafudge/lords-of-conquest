@@ -1,30 +1,40 @@
-# Dependencies
+# Dependencies (any implementation folder)
 node_modules/
 
-# Build output
+# Build artifacts and caches
 dist/
+build/
 .vite/
+coverage/
+.nyc_output/
+*.tsbuildinfo
 
-# Editor
-.vscode/
-.idea/
-*.swp
-.DS_Store
+# Test artifacts
+playwright-report/
+test-results/
 
 # Logs
 *.log
 npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
 
-# Environment
+# Environment files
 .env
 .env.local
+.env.*.local
+
+# Editor and OS noise
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
 
 # Brainstorming session artifacts (Claude Code superpowers)
 .superpowers/
 
 # Decompiled Gettman source — used as implementation reference, not redistributed
 .reference/
-
-# Playwright test output
-playwright-report/
-test-results/
