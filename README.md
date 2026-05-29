@@ -2,6 +2,10 @@
 
 This repository is organized as a collection of Lords of Conquest (LOC) implementations.
 
+## Live Site
+
+GitHub Pages: https://mafudge.github.io/lords-of-conquest/
+
 ## Implementations
 
 - `implementations/rgettman-cheerpj/`
